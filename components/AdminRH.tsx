@@ -84,7 +84,7 @@ export default function AdminRH({ tickets, vacancies, onAddJob, onUpdateERP }: A
                       {t.role === 'client' ? <Building2 size={14} className="inline mr-2" /> : <UserCheck size={14} className="inline mr-2" />}
                       {t.company || t.name}
                     </td>
-                    <td className="py-6 italic text-slate-500">{t.resumeName || 'N/A'}</td>
+                    <td className="py-6 italic text-slate-500">{t.resume_name || 'N/A'}</td>
                     <td className="py-6 text-right"><button onClick={() => setEditingId(t.id)} className="bg-cyan-500 text-slate-950 px-4 py-2 rounded-lg font-black text-[9px] uppercase">ERP</button></td>
                   </tr>
                 ))}

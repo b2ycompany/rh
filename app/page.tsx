@@ -15,7 +15,7 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-// --- DEFINIÇÃO DE INTERFACES GLOBAIS ---
+// --- INTERFACES GLOBAIS (ESTRUTURA COMPLETA) ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin';
 
@@ -40,15 +40,15 @@ export interface TicketData {
   region?: string;
   linkedin_url?: string;
   company_site?: string;
-  company?: string;      
+  company?: string;
   area: string;
   custom_area?: string;
   seniority?: string;
   quantity?: number;
   status: string;
   date: string;
-  resume_url?: string; // Mapeado para resume_url no banco
-  // Campos ERP (Contrato e Faturamento)
+  resume_url?: string;
+  // Campos ERP (Nomes padronizados para o Banco de Dados)
   project_name?: string;
   monthly_value?: number;
   contract_start?: string;
@@ -66,16 +66,15 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
-  // --- SINCRONIZAÇÃO COM O BANCO DE DADOS (SUPABASE) ---
+  // Sincronização em tempo real com Supabase
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
       const { data: tix } = await supabase.from('tickets').select('*').order('created_at', { ascending: false });
-      
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("Falha na sincronização:", err);
+      console.error("Erro na busca:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
@@ -85,9 +84,9 @@ export default function TammyPlatform() {
     fetchData();
   }, []);
 
-  // --- CRIAÇÃO DE TICKET (ONBOARDING) ---
+  // Criar Ticket (Lead Onboarding)
   const handleTicketCreate = async (data: any) => {
-    const newTicket = {
+    const newTicket: TicketData = {
       id: `TAMMY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       role: userRole,
       name: data.name,
@@ -105,132 +104,70 @@ export default function TammyPlatform() {
       quantity: data.quantity || 1,
       date: new Date().toLocaleDateString('pt-BR'),
       status: "Discovery",
-      resume_url: data.resumeName // Guardamos o nome do arquivo enviado
+      resume_url: data.resumeName
     };
 
     const { error } = await supabase.from('tickets').insert([newTicket]);
     
     if (!error) {
-      setActiveTicket(newTicket as any);
-      setAllTickets(prev => [newTicket as any, ...prev]);
+      setActiveTicket(newTicket);
+      setAllTickets(prev => [newTicket, ...prev]);
       setView('home');
     } else {
-      alert(`Erro ao salvar no banco: ${error.message}`);
+      alert(`Erro no banco: ${error.message}`);
     }
   };
 
-  // --- GESTÃO DE VAGAS (ADMIN) ---
   const handleAddJob = async (job: JobData) => {
     const { error } = await supabase.from('jobs').insert([job]);
-    if (!error) {
-      setVacancies(prev => [job, ...prev]);
-    } else {
-      alert("Erro ao publicar vaga.");
-    }
+    if (!error) setVacancies(prev => [job, ...prev]);
   };
 
-  // --- ATUALIZAÇÃO ERP (ADMIN) ---
   const updateTicketERP = async (id: string, updatedData: any) => {
-    // Mapeamento para os nomes de colunas do banco (snake_case)
-    const dbPayload = {
-      status: updatedData.status,
-      project_name: updatedData.project_name,
-      monthly_value: updatedData.monthly_value,
-      contract_start: updatedData.contract_start,
-      contract_end: updatedData.contract_end,
-      payment_status: updatedData.payment_status
-    };
-
-    const { error } = await supabase.from('tickets').update(dbPayload).eq('id', id);
-
+    const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
     if (!error) {
-      // Atualiza localmente para refletir no Admin e Dashboard sem refresh
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
-    } else {
-      alert(`Erro ERP: ${error.message}`);
     }
-  };
-
-  const resetSession = () => {
-    setActiveTicket(null);
-    setUserRole(null);
-    setView('home');
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-cyan-500 font-sans antialiased overflow-x-hidden">
       <AnimatePresence mode="wait">
-        {isLoading && <SplashScreen key="splash" finishLoading={() => setIsLoading(false)} />}
+        {isLoading && <SplashScreen finishLoading={() => setIsLoading(false)} />}
       </AnimatePresence>
 
       {!isLoading && (
         <div className="relative">
-          <Navigation 
-            setView={setView} 
-            activeTicket={activeTicket} 
-            resetSession={resetSession} 
-          />
-          
+          <Navigation setView={setView} activeTicket={activeTicket} resetSession={() => {setActiveTicket(null); setView('home');}} />
           <main className="pt-24 pb-20">
             <AnimatePresence mode="wait">
-              
-              {/* VIEW: HOME */}
               {view === 'home' && !activeTicket && (
-                <motion.div key="h-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <Hero setUserRole={(role: UserRole) => { setUserRole(role); setView('discovery'); }} />
+                <motion.div key="h" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <Hero setUserRole={(r: any) => { setUserRole(r); setView('discovery'); }} />
                   <Stats />
-                  <JobBoard 
-                    vacancies={vacancies} 
-                    onApply={(job: JobData) => {
-                      setUserRole('candidate');
-                      setFormData({ area: job.area, seniority: job.seniority });
-                      setView('discovery');
-                    }} 
-                  />
+                  <JobBoard vacancies={vacancies} onApply={(j: JobData) => { setUserRole('candidate'); setFormData({area: j.area, seniority: j.seniority}); setView('discovery'); }} />
                   <Content />
                 </motion.div>
               )}
-
-              {/* VIEW: DASHBOARD USUÁRIO */}
               {view === 'home' && activeTicket && (
-                <motion.div key="d-view" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
+                <motion.div key="d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
                   <Dashboard ticket={activeTicket} />
-                  <div className="mt-12 text-center">
-                    <button onClick={resetSession} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-cyan-500 transition-colors">Novo Discovery</button>
-                  </div>
                 </motion.div>
               )}
-
-              {/* VIEW: DISCOVERY FORM */}
               {view === 'discovery' && (
-                <motion.div key="disc-view" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
-                  <Discovery 
-                    role={userRole} 
-                    initialData={formData} 
-                    onSubmit={handleTicketCreate} 
-                  />
+                <motion.div key="disc" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
+                  <Discovery role={userRole} initialData={formData} onSubmit={handleTicketCreate} />
                 </motion.div>
               )}
-
-              {/* VIEW: ADMIN PANEL */}
               {view === 'admin' && (
-                <motion.div key="adm-view" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
-                  <AdminRH 
-                    tickets={allTickets} 
-                    vacancies={vacancies} 
-                    onAddJob={handleAddJob} 
-                    onUpdateERP={updateTicketERP} 
-                  />
+                <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
+                  <AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={handleAddJob} onUpdateERP={updateTicketERP} />
                 </motion.div>
               )}
-
             </AnimatePresence>
           </main>
-
-          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.6em] text-slate-700 italic">
-              Lion Solution & B2Y Group | Tammy RH & Hunting
-            </p>
+          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase">
+            Lion Solution & B2Y Group | Tammy RH & Hunting
           </footer>
         </div>
       )}

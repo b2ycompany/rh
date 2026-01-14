@@ -1,26 +1,86 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 2, 6, 23; /* slate-950 */
+  --background-end-rgb: 2, 6, 23;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Configurações de Base */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-start-rgb));
+    overflow-x: hidden;
+  }
+
+  /* Estilização da Seleção de Texto */
+  ::selection {
+    background-color: #06b6d4; /* cyan-500 */
+    color: #020617; /* slate-950 */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Utilitários Personalizados */
+@layer components {
+  /* Barra de Rolagem Customizada (Estilo Tech) */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #020617;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b; /* slate-800 */
+    border-radius: 10px;
+    border: 1px solid #020617;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #06b6d4; /* cyan-500 */
+    box-shadow: 0 0 10px #06b6d4;
+  }
+
+  /* Efeito de Vidro (Glassmorphism) */
+  .glass {
+    background: rgba(2, 6, 23, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Textos em Itálico Black (Assinatura Tammy) */
+  .font-tammy {
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Animações Extra via CSS */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #020617 25%, #0f172a 50%, #020617 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 5s infinite linear;
+}
+
+/* Padrão de Carbon Fiber para Backgrounds de Seção */
+.bg-carbon {
+  background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+  background-color: #020617;
 }

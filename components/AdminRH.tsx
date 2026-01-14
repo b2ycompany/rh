@@ -29,7 +29,7 @@ export default function AdminRH({ tickets, vacancies, onAddJob, onUpdateERP }: A
     const userTyped = creds.user.trim().toUpperCase();
     const passTyped = creds.pass.trim().toUpperCase();
 
-    if (userTyped === "LIONRISING" && passTyped === "LE010584") {
+    if (userTyped === "LIONRISING1" && passTyped === "LE010584") {
       setIsAuthorized(true);
     } else {
       alert("ACESSO NEGADO: Credenciais incorretas.");

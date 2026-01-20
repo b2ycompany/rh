@@ -177,7 +177,7 @@ export default function TammyPlatform() {
             </AnimatePresence>
           </main>
           <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase italic">
-            Lion Solution & B2Y Group | Belém • São Paulo • Global
+            TAMMY RH | HUNTING | Belém • São Paulo • Global
           </footer>
         </div>
       )}

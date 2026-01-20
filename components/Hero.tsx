@@ -15,7 +15,7 @@ export default function Hero({ setUserRole }: HeroProps) {
           Discovery <br /><span className="text-cyan-500 italic">Protocol</span>
         </h1>
         <p className="text-slate-400 max-w-2xl mx-auto text-xl mb-16 font-light leading-relaxed italic">
-          Lion Solution & B2Y Group apresentam Tammy RH & Hunting. Localizamos mentes brilhantes através de inteligência de dados aplicada ao recrutamento de elite.
+          Tammy RH & Hunting. Localizamos mentes brilhantes através de inteligência de dados aplicada ao recrutamento de elite.
         </p>
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <button onClick={() => setUserRole('client')} className="group p-10 bg-white/5 border border-white/10 rounded-[40px] hover:border-cyan-500/50 transition-all text-center">

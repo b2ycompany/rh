@@ -179,7 +179,7 @@ export default function Dashboard({ ticket }: { ticket: TicketData }) {
             <div className="p-12 bg-white/5 rounded-[50px] border border-white/5 text-center italic relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-30" />
                <p className="text-slate-500 text-sm font-light relative z-10 leading-relaxed">
-                Os dados deste protocolo estão sob auditoria do PMO da **Lion Solution & B2Y Group**. <br />
+                Os dados deste protocolo estão sob auditoria TAMMY RH | HUNTING. <br />
                 As informações financeiras e contratuais serão liberadas automaticamente após a validação do RH.
               </p>
             </div>

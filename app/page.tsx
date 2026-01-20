@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 
-// Componentes Modulares
 import SplashScreen from '@/components/SplashScreen';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
@@ -15,45 +14,22 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-// --- INTERFACES GLOBAIS (ESTRUTURA COMPLETA) ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin';
 
 export interface JobData {
-  id: string;
-  title: string;
-  area: string;
-  seniority: string;
-  description: string;
-  salary: string;
-  status: 'Ativa' | 'Pausada';
+  id: string; title: string; area: string; seniority: string;
+  description: string; salary: string; status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
-  id: string;
-  role: UserRole;
-  name: string;
-  email?: string;
-  whatsapp?: string;
-  cep?: string;
-  cpf_cnpj?: string;
-  region?: string;
-  linkedin_url?: string;
-  company_site?: string;
-  company?: string;
-  area: string;
-  custom_area?: string;
-  seniority?: string;
-  quantity?: number;
-  status: string;
-  date: string;
-  resume_url?: string;
-  // Campos ERP (Nomes padronizados para o Banco de Dados)
-  project_name?: string;
-  monthly_value?: number;
-  contract_start?: string;
-  contract_end?: string;
-  payment_status?: string;
+  id: string; role: UserRole; name: string; email?: string;
+  whatsapp?: string; cep?: string; cpf_cnpj?: string; region?: string;
+  linkedin_url?: string; company_site?: string; company?: string;
+  area: string; custom_area?: string; seniority?: string;
+  quantity?: number; status: string; date: string; resume_url?: string;
+  project_name?: string; monthly_value?: number; contract_start?: string;
+  contract_end?: string; payment_status?: string;
 }
 
 export default function TammyPlatform() {
@@ -66,7 +42,6 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
-  // Sincronização em tempo real com Supabase
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -84,10 +59,9 @@ export default function TammyPlatform() {
     fetchData();
   }, []);
 
-  // Criar Ticket (Lead Onboarding)
   const handleTicketCreate = async (data: any) => {
     const newTicket: TicketData = {
-      id: `TAMMY-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
       role: userRole,
       name: data.name,
       email: data.email,
@@ -103,12 +77,11 @@ export default function TammyPlatform() {
       seniority: data.seniority,
       quantity: data.quantity || 1,
       date: new Date().toLocaleDateString('pt-BR'),
-      status: "Discovery",
+      status: userRole === 'client' ? "Cotação" : "Discovery",
       resume_url: data.resumeName
     };
 
     const { error } = await supabase.from('tickets').insert([newTicket]);
-    
     if (!error) {
       setActiveTicket(newTicket);
       setAllTickets(prev => [newTicket, ...prev]);
@@ -167,7 +140,7 @@ export default function TammyPlatform() {
             </AnimatePresence>
           </main>
           <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase">
-            Lion Solution & B2Y Group | Tammy RH & Hunting
+            Lion Solution & B2Y Group | Belém • São Paulo • Global
           </footer>
         </div>
       )}

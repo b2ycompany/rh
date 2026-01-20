@@ -15,40 +15,45 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-// --- INTERFACES GLOBAIS ---
+// --- INTERFACES GLOBAIS (ESTRUTURA COMPLETA E ATUALIZADA) ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin';
 
 export interface JobData {
-  id: string; 
-  title: string; 
-  area: string; 
+  id: string;
+  title: string;
+  area: string;
   seniority: string;
-  description: string; 
-  salary: string; 
+  description: string;
+  salary: string;
   status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
-  id: string; 
-  role: UserRole; 
-  name: string; 
+  id: string;
+  role: UserRole;
+  name: string;
   email?: string;
-  whatsapp?: string; 
-  cep?: string; 
-  cpf_cnpj?: string; 
+  whatsapp?: string;
+  cep?: string;
+  cpf_cnpj?: string;
+  logradouro?: string;   // Campo Adicionado
+  numero?: string;       // Campo Adicionado
+  bairro?: string;       // Campo Adicionado
+  cidade?: string;       // Campo Adicionado
+  uf?: string;           // Campo Adicionado
   region?: string;
-  linkedin_url?: string; 
-  company_site?: string; 
+  linkedin_url?: string;
+  company_site?: string;
   company?: string;
-  area: string; 
-  custom_area?: string; 
+  area: string;
+  custom_area?: string;
   seniority?: string;
-  quantity?: number; 
-  status: string; 
-  date: string; 
+  quantity?: number;
+  status: string;
+  date: string;
   resume_url?: string;
-  // Campos ERP (Nomes sincronizados com o Banco de Dados)
+  // Campos ERP (Nomes padronizados para o Banco de Dados)
   project_name?: string;
   monthly_value?: number;
   contract_start?: string;
@@ -66,7 +71,7 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
-  // Sincronização de Dados com Supabase
+  // Sincronização em tempo real com Supabase
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -74,7 +79,7 @@ export default function TammyPlatform() {
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("Erro na busca de dados:", err);
+      console.error("Erro na busca:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
@@ -84,44 +89,54 @@ export default function TammyPlatform() {
     fetchData();
   }, []);
 
-  // --- FUNÇÕES DE GESTÃO DE VAGAS (MARKETPLACE) ---
+  // Criar Ticket (Lead Onboarding)
+  const handleTicketCreate = async (data: any) => {
+    const newTicket: TicketData = {
+      id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
+      role: userRole,
+      name: data.name,
+      email: data.email,
+      whatsapp: data.whatsapp,
+      cep: data.cep,
+      cpf_cnpj: data.cpf_cnpj,
+      logradouro: data.logradouro,
+      numero: data.numero,
+      bairro: data.bairro,
+      cidade: data.cidade,
+      uf: data.uf,
+      region: data.region,
+      linkedin_url: data.linkedinUrl,
+      company_site: data.companySite,
+      company: data.company || data.companySite || data.name,
+      area: data.area,
+      custom_area: data.customArea,
+      seniority: data.seniority,
+      quantity: data.quantity || 1,
+      date: new Date().toLocaleDateString('pt-BR'),
+      status: userRole === 'client' ? "Cotação" : "Discovery",
+      resume_url: data.resumeName
+    };
+
+    const { error } = await supabase.from('tickets').insert([newTicket]);
+    
+    if (!error) {
+      setActiveTicket(newTicket);
+      setAllTickets(prev => [newTicket, ...prev]);
+      setView('home');
+    } else {
+      alert(`Erro no banco: ${error.message}`);
+    }
+  };
+
   const handleAddJob = async (job: JobData) => {
     const { error } = await supabase.from('jobs').insert([job]);
     if (!error) setVacancies(prev => [job, ...prev]);
-    else alert("Erro ao criar vaga no marketplace.");
   };
 
   const handleUpdateJob = async (id: string, updatedJob: Partial<JobData>) => {
     const { error } = await supabase.from('jobs').update(updatedJob).eq('id', id);
     if (!error) {
       setVacancies(prev => prev.map(j => j.id === id ? { ...j, ...updatedJob } : j));
-    } else {
-      alert("Erro ao atualizar os dados da vaga.");
-    }
-  };
-
-  // --- FUNÇÕES DE LEAD E ERP ---
-  const handleTicketCreate = async (data: any) => {
-    const newTicket: TicketData = {
-      id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
-      role: userRole,
-      name: data.name, email: data.email, whatsapp: data.whatsapp,
-      cep: data.cep, cpf_cnpj: data.cpf_cnpj, region: data.region,
-      linkedin_url: data.linkedinUrl, company_site: data.companySite,
-      company: data.company || data.companySite || data.name,
-      area: data.area, custom_area: data.customArea, seniority: data.seniority,
-      quantity: data.quantity || 1, date: new Date().toLocaleDateString('pt-BR'),
-      status: userRole === 'client' ? "Cotação" : "Discovery",
-      resume_url: data.resumeName
-    };
-
-    const { error } = await supabase.from('tickets').insert([newTicket]);
-    if (!error) {
-      setActiveTicket(newTicket);
-      setAllTickets(prev => [newTicket, ...prev]);
-      setView('home');
-    } else {
-      alert(`Erro ao salvar lead: ${error.message}`);
     }
   };
 
@@ -129,8 +144,6 @@ export default function TammyPlatform() {
     const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
     if (!error) {
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
-    } else {
-      alert("Erro ao atualizar contrato ERP.");
     }
   };
 
@@ -146,7 +159,7 @@ export default function TammyPlatform() {
           <main className="pt-24 pb-20">
             <AnimatePresence mode="wait">
               {view === 'home' && !activeTicket && (
-                <motion.div key="h-v" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div key="h" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <Hero setUserRole={(r: any) => { setUserRole(r); setView('discovery'); }} />
                   <Stats />
                   <JobBoard vacancies={vacancies} onApply={(j: JobData) => { setUserRole('candidate'); setFormData({area: j.area, seniority: j.seniority}); setView('discovery'); }} />
@@ -154,17 +167,17 @@ export default function TammyPlatform() {
                 </motion.div>
               )}
               {view === 'home' && activeTicket && (
-                <motion.div key="d-v" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
+                <motion.div key="d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
                   <Dashboard ticket={activeTicket} />
                 </motion.div>
               )}
               {view === 'discovery' && (
-                <motion.div key="disc-v" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
+                <motion.div key="disc" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
                   <Discovery role={userRole} initialData={formData} onSubmit={handleTicketCreate} />
                 </motion.div>
               )}
               {view === 'admin' && (
-                <motion.div key="adm-v" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
+                <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
                   <AdminRH 
                     tickets={allTickets} 
                     vacancies={vacancies} 
@@ -176,8 +189,8 @@ export default function TammyPlatform() {
               )}
             </AnimatePresence>
           </main>
-          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase italic">
-            TAMMY RH | HUNTING | Belém • São Paulo • Global
+          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase">
+            Lion Solution & B2Y Group | Tammy RH & Hunting
           </footer>
         </div>
       )}

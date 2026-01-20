@@ -1,17 +1,36 @@
 import { 
-  BarChart3, 
-  Workflow, 
   Database, 
   MapPin, 
   ShieldCheck, 
-  Zap, 
   Terminal, 
   Globe, 
   Search, 
-  BrainCircuit 
+  BrainCircuit,
+  Phone
 } from 'lucide-react';
 
 export default function Content() {
+  const locations = [
+    {
+      city: "São Paulo",
+      unit: "Unidade Paulista",
+      address: "Av. Paulista, 2313, 7º Andar - São Paulo, SP",
+      phone: "+55 11 3179.6680",
+      building: "Edifício São Luís",
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.19746430335!2d-46.6601672!3d-23.5577546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59cd0b378051%3A0x66f6f96612f07f43!2sAv.%20Paulista%2C%202313%20-%20Consola%C3%A7%C3%A3o%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2001311-300!5e0!3m2!1spt-BR!2sbr!4v1705770000000!5m2!1spt-BR!2sbr",
+      badge: "Sede Corporativa"
+    },
+    {
+      city: "Belém",
+      unit: "Unidade Reduto",
+      address: "Tv. Quintino Bocaiúva, 2301 - Reduto, Belém - PA",
+      phone: "+55 91 98888-8888",
+      building: "Rogélio Fernandez Business Center",
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.3338870535316!2d-48.4870409!3d-1.4423854!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x92a48ea31e138a0b%3A0xc3f8e4348a4746f3!2sRog%C3%A9lio%20Fernandez%20Business%20Center!5e0!3m2!1spt-BR!2sbr!4v1705770000001!5m2!1spt-BR!2sbr",
+      badge: "Base Operacional"
+    }
+  ];
+
   return (
     <section className="py-24 space-y-32">
       {/* SEÇÃO: FLUXO DE GOVERNANÇA */}
@@ -53,56 +72,71 @@ export default function Content() {
         </div>
       </div>
 
-      {/* SEÇÃO: MAPA E PRESENÇA LOCAL BELÉM */}
-      <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-        <div className="space-y-6">
-          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-tight italic">
-            Tammy <span className="text-cyan-500 font-black">Belém Base</span>
+      {/* SEÇÃO: PRESENÇA NACIONAL (MAPAS) */}
+      <div className="container mx-auto px-6">
+        <div className="mb-16">
+          <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-tight italic">
+            Presença <span className="text-cyan-500 font-black italic">Estratégica</span>
           </h2>
-          <div className="flex items-start gap-4 text-slate-400">
-            <MapPin className="text-cyan-400 shrink-0" size={24} />
-            <div className="space-y-1">
-              <p className="font-black text-white uppercase tracking-wider text-xs italic">Rogélio Fernandez Business Center</p>
-              <p className="text-sm tracking-widest leading-relaxed uppercase italic">
-                Tv. Quintino Bocaiúva, 2301 - Reduto, Belém - PA
-              </p>
-            </div>
-          </div>
-          
-          <div className="h-80 w-full rounded-[40px] overflow-hidden border border-white/10 grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl relative">
-            <div className="absolute top-4 right-4 z-10 bg-slate-950/80 backdrop-blur px-4 py-2 rounded-full border border-white/10 text-[8px] font-black uppercase tracking-widest text-cyan-400">
-              Sede Administrativa
-            </div>
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3990.540121!2d-48.4902!3d-1.4586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x92a48eb62!2sTv.%20Quintino%20Bocai%C3%BAva%2C%202301%20-%20Reduto%2C%20Bel%C3%A9m%20-%20PA%2C%2066045-315!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" 
-              width="100%" 
-              height="100%" 
-              style={{ border: 0 }} 
-              allowFullScreen 
-              loading="lazy" 
-            />
-          </div>
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-2">
+            Hubs de Tecnologia e Governança
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <div className="bg-slate-900/50 p-10 rounded-[40px] border border-white/5">
-            <div className="flex gap-4 items-center mb-6">
-               <Globe className="text-cyan-500" size={32} />
-               <h3 className="text-xl font-black uppercase italic">Alcance Global</h3>
+        <div className="grid lg:grid-cols-2 gap-12">
+          {locations.map((loc, idx) => (
+            <div key={idx} className="space-y-8">
+              <div className="flex items-start gap-4 text-slate-400 text-left">
+                <MapPin className="text-cyan-400 shrink-0" size={28} />
+                <div className="space-y-1">
+                  <p className="font-black text-white uppercase tracking-wider text-xs italic">{loc.building}</p>
+                  <p className="text-sm tracking-widest leading-relaxed uppercase italic">
+                    {loc.address}
+                  </p>
+                  <div className="flex items-center gap-2 text-cyan-500/70 font-mono text-xs mt-2 italic">
+                    <Phone size={14} /> {loc.phone}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="h-[400px] w-full rounded-[40px] overflow-hidden border border-white/10 grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl relative">
+                <div className="absolute top-4 right-4 z-10 bg-slate-950/80 backdrop-blur px-4 py-2 rounded-full border border-white/10 text-[8px] font-black uppercase tracking-widest text-cyan-400">
+                  {loc.badge}
+                </div>
+                <iframe 
+                  src={loc.mapUrl} 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
             </div>
-            <p className="text-slate-500 text-sm leading-relaxed italic font-light italic">
-              Conectamos o talento tech da Amazônia com empresas globais. Nossa metodologia quebra barreiras geográficas através de governança ágil e PMO de alta performance.
-            </p>
+          ))}
+        </div>
+      </div>
+
+      {/* SEÇÃO: ALCANCE E DADOS AUDITADOS */}
+      <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-10">
+        <div className="bg-slate-900/50 p-10 rounded-[40px] border border-white/5 text-left">
+          <div className="flex gap-4 items-center mb-6">
+             <Globe className="text-cyan-500" size={32} />
+             <h3 className="text-xl font-black uppercase italic">Alcance Nacional</h3>
           </div>
-          <div className="bg-white/5 p-10 rounded-[40px] border border-white/5">
-            <div className="flex gap-4 items-center mb-6">
-               <Database className="text-blue-500" size={32} />
-               <h3 className="text-xl font-black uppercase italic">Dados Auditados</h3>
-            </div>
-            <p className="text-slate-500 text-sm leading-relaxed italic font-light italic">
-              Todos os indicadores de contratação são auditados e disponibilizados no painel do contratante, garantindo compliance e transparência total.
-            </p>
+          <p className="text-slate-500 text-sm leading-relaxed italic font-light italic">
+            Conectamos o talento tech da Amazônia aos maiores polos financeiros do país. Nossa presença em São Paulo e Belém garante um ecossistema de hunting ágil e governança de alta performance.
+          </p>
+        </div>
+        <div className="bg-white/5 p-10 rounded-[40px] border border-white/5 text-left">
+          <div className="flex gap-4 items-center mb-6">
+             <Database className="text-blue-500" size={32} />
+             <h3 className="text-xl font-black uppercase italic">Dados Auditados</h3>
           </div>
+          <p className="text-slate-500 text-sm leading-relaxed italic font-light italic">
+            Todos os indicadores de contratação são auditados e disponibilizados no painel do contratante, garantindo compliance e transparência total em todas as nossas unidades operacionais.
+          </p>
         </div>
       </div>
     </section>

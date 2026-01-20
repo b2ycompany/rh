@@ -12,7 +12,7 @@ export default function Navigation({ setView, activeTicket }: any) {
         <div className="flex gap-8 items-center">
           <div className="hidden lg:flex gap-4 items-center text-slate-500">
             <MapPin size={14} className="text-cyan-500" />
-            <span className="text-[10px] uppercase font-bold tracking-widest">Belém, PA - Reduto</span>
+            <span className="text-[10px] uppercase font-bold tracking-widest">Belém, PA - São Paulo, SP</span>
           </div>
           {activeTicket && (
             <button onClick={() => setView('home')} className="flex items-center gap-2 text-[10px] font-black uppercase text-cyan-500 bg-cyan-500/10 px-4 py-2 rounded-full border border-cyan-500/20 transition-all">

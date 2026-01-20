@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 
+// Componentes Modulares
 import SplashScreen from '@/components/SplashScreen';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
@@ -14,22 +15,45 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
+// --- INTERFACES GLOBAIS ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin';
 
 export interface JobData {
-  id: string; title: string; area: string; seniority: string;
-  description: string; salary: string; status: 'Ativa' | 'Pausada';
+  id: string; 
+  title: string; 
+  area: string; 
+  seniority: string;
+  description: string; 
+  salary: string; 
+  status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
-  id: string; role: UserRole; name: string; email?: string;
-  whatsapp?: string; cep?: string; cpf_cnpj?: string; region?: string;
-  linkedin_url?: string; company_site?: string; company?: string;
-  area: string; custom_area?: string; seniority?: string;
-  quantity?: number; status: string; date: string; resume_url?: string;
-  project_name?: string; monthly_value?: number; contract_start?: string;
-  contract_end?: string; payment_status?: string;
+  id: string; 
+  role: UserRole; 
+  name: string; 
+  email?: string;
+  whatsapp?: string; 
+  cep?: string; 
+  cpf_cnpj?: string; 
+  region?: string;
+  linkedin_url?: string; 
+  company_site?: string; 
+  company?: string;
+  area: string; 
+  custom_area?: string; 
+  seniority?: string;
+  quantity?: number; 
+  status: string; 
+  date: string; 
+  resume_url?: string;
+  // Campos ERP (Nomes sincronizados com o Banco de Dados)
+  project_name?: string;
+  monthly_value?: number;
+  contract_start?: string;
+  contract_end?: string;
+  payment_status?: string;
 }
 
 export default function TammyPlatform() {
@@ -42,6 +66,7 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
+  // Sincronização de Dados com Supabase
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -49,7 +74,7 @@ export default function TammyPlatform() {
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("Erro na busca:", err);
+      console.error("Erro na busca de dados:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
@@ -59,24 +84,33 @@ export default function TammyPlatform() {
     fetchData();
   }, []);
 
+  // --- FUNÇÕES DE GESTÃO DE VAGAS (MARKETPLACE) ---
+  const handleAddJob = async (job: JobData) => {
+    const { error } = await supabase.from('jobs').insert([job]);
+    if (!error) setVacancies(prev => [job, ...prev]);
+    else alert("Erro ao criar vaga no marketplace.");
+  };
+
+  const handleUpdateJob = async (id: string, updatedJob: Partial<JobData>) => {
+    const { error } = await supabase.from('jobs').update(updatedJob).eq('id', id);
+    if (!error) {
+      setVacancies(prev => prev.map(j => j.id === id ? { ...j, ...updatedJob } : j));
+    } else {
+      alert("Erro ao atualizar os dados da vaga.");
+    }
+  };
+
+  // --- FUNÇÕES DE LEAD E ERP ---
   const handleTicketCreate = async (data: any) => {
     const newTicket: TicketData = {
       id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
       role: userRole,
-      name: data.name,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      cep: data.cep,
-      cpf_cnpj: data.cpf_cnpj,
-      region: data.region,
-      linkedin_url: data.linkedinUrl,
-      company_site: data.companySite,
+      name: data.name, email: data.email, whatsapp: data.whatsapp,
+      cep: data.cep, cpf_cnpj: data.cpf_cnpj, region: data.region,
+      linkedin_url: data.linkedinUrl, company_site: data.companySite,
       company: data.company || data.companySite || data.name,
-      area: data.area,
-      custom_area: data.customArea,
-      seniority: data.seniority,
-      quantity: data.quantity || 1,
-      date: new Date().toLocaleDateString('pt-BR'),
+      area: data.area, custom_area: data.customArea, seniority: data.seniority,
+      quantity: data.quantity || 1, date: new Date().toLocaleDateString('pt-BR'),
       status: userRole === 'client' ? "Cotação" : "Discovery",
       resume_url: data.resumeName
     };
@@ -87,19 +121,16 @@ export default function TammyPlatform() {
       setAllTickets(prev => [newTicket, ...prev]);
       setView('home');
     } else {
-      alert(`Erro no banco: ${error.message}`);
+      alert(`Erro ao salvar lead: ${error.message}`);
     }
-  };
-
-  const handleAddJob = async (job: JobData) => {
-    const { error } = await supabase.from('jobs').insert([job]);
-    if (!error) setVacancies(prev => [job, ...prev]);
   };
 
   const updateTicketERP = async (id: string, updatedData: any) => {
     const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
     if (!error) {
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
+    } else {
+      alert("Erro ao atualizar contrato ERP.");
     }
   };
 
@@ -115,7 +146,7 @@ export default function TammyPlatform() {
           <main className="pt-24 pb-20">
             <AnimatePresence mode="wait">
               {view === 'home' && !activeTicket && (
-                <motion.div key="h" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div key="h-v" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <Hero setUserRole={(r: any) => { setUserRole(r); setView('discovery'); }} />
                   <Stats />
                   <JobBoard vacancies={vacancies} onApply={(j: JobData) => { setUserRole('candidate'); setFormData({area: j.area, seniority: j.seniority}); setView('discovery'); }} />
@@ -123,23 +154,29 @@ export default function TammyPlatform() {
                 </motion.div>
               )}
               {view === 'home' && activeTicket && (
-                <motion.div key="d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
+                <motion.div key="d-v" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
                   <Dashboard ticket={activeTicket} />
                 </motion.div>
               )}
               {view === 'discovery' && (
-                <motion.div key="disc" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
+                <motion.div key="disc-v" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
                   <Discovery role={userRole} initialData={formData} onSubmit={handleTicketCreate} />
                 </motion.div>
               )}
               {view === 'admin' && (
-                <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
-                  <AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={handleAddJob} onUpdateERP={updateTicketERP} />
+                <motion.div key="adm-v" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
+                  <AdminRH 
+                    tickets={allTickets} 
+                    vacancies={vacancies} 
+                    onAddJob={handleAddJob} 
+                    onUpdateJob={handleUpdateJob}
+                    onUpdateERP={updateTicketERP} 
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
           </main>
-          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase">
+          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase italic">
             Lion Solution & B2Y Group | Belém • São Paulo • Global
           </footer>
         </div>

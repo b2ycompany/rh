@@ -1,191 +1,279 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Ticket, CheckCircle2, Clock, Wallet, Calendar, 
-  Briefcase, ShieldCheck, FileText, TrendingUp, Zap 
+  CheckCircle2, 
+  Clock, 
+  ShieldCheck, 
+  MapPin, 
+  Briefcase, 
+  Star, 
+  Cpu, 
+  UserCircle, 
+  Search, 
+  Zap, 
+  Database, 
+  Wallet, 
+  Calendar, 
+  FileCheck, 
+  ShieldAlert,
+  ArrowUpRight,
+  TrendingUp,
+  Activity,
+  Award,
+  Globe,
+  Lock,
+  FileText,
+  Download,
+  Target,
+  Fingerprint,
+  Mail
 } from 'lucide-react';
 import { TicketData } from '@/app/page';
 
+/**
+ * COMPONENTE: DASHBOARD ESTRATÉGICO DO CANDIDATO
+ * Versão: 5.0 - Governança Lion Rising & B2Y Group
+ * Descrição: Portal completo de acompanhamento, faturamento e status técnico.
+ */
+
 export default function Dashboard({ ticket }: { ticket: TicketData }) {
-  const steps = ["Discovery", "Hunting", "Shortlist", "Entrevista", "Contratado"];
-  
-  const getProgressWidth = () => {
-    if (ticket.status === 'Contratado') return '100%';
-    if (ticket.status === 'Entrevista') return '75%';
-    if (ticket.status === 'Shortlist') return '50%';
-    return '20%';
+  // Lógica de Status da Timeline baseada na Governança
+  const steps = useMemo(() => [
+    { label: "Discovery", active: ["Discovery", "Shortlist", "Aprovado", "Contratado"].includes(ticket.status) },
+    { label: "Matching", active: ["Shortlist", "Aprovado", "Contratado"].includes(ticket.status) },
+    { label: "Aprovação", active: ["Aprovado", "Contratado"].includes(ticket.status) },
+    { label: "Alocação", active: ticket.status === "Contratado" }
+  ], [ticket.status]);
+
+  // Variantes de Animação Densas
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.8, ease: "easeOut", staggerChildren: 0.1 } 
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
   };
 
   return (
-    <section className="container mx-auto px-6 space-y-12">
-      {/* HEADER PREMIUM */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex items-center gap-6">
-          <div className="p-5 bg-cyan-500/10 rounded-[28px] border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
-            <Ticket size={36} className="text-cyan-500" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">
-              Meu <span className="text-cyan-500 font-black">Protocolo</span>
-            </h2>
-            <p className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.3em]">
-              ID: {ticket.id} • {ticket.date}
-            </p>
-          </div>
+    <section className="container mx-auto px-6 max-w-6xl py-12 text-left">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="bg-slate-900/60 p-10 md:p-20 rounded-[100px] border border-cyan-500/20 backdrop-blur-3xl shadow-2xl relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 p-16 opacity-[0.02] pointer-events-none">
+          <Database size={400} className="text-cyan-500" />
         </div>
-        
-        <div className="flex items-center gap-3 bg-white/5 px-8 py-4 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md">
-          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
-            Status: {ticket.status}
-          </span>
-        </div>
-      </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* COLUNA: RESUMO IA */}
-        <div className="space-y-6">
-          <div className="bg-slate-900 p-10 rounded-[50px] border border-white/5 shadow-2xl relative overflow-hidden group">
-            <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Zap size={140} className="text-cyan-500" />
-            </div>
-            <h4 className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-8 italic">Dados do Discovery</h4>
-            <div className="space-y-8">
-              <div>
-                <p className="text-[9px] uppercase font-bold text-cyan-500/60 mb-2">Entidade</p>
-                <p className="text-xl font-black uppercase italic text-white leading-none">{ticket.company || ticket.name}</p>
-              </div>
-              <div>
-                <p className="text-[9px] uppercase font-bold text-cyan-500/60 mb-2">Especialidade / Região</p>
-                <p className="text-sm font-bold text-slate-300 uppercase italic">{ticket.area} • {ticket.region || "Belém"}</p>
-              </div>
-              <div>
-                <p className="text-[9px] uppercase font-bold text-cyan-500/60 mb-2">Responsável</p>
-                <p className="text-sm font-bold text-slate-300 uppercase">{ticket.name}</p>
+        {/* --- HEADER DO PORTAL DO CANDIDATO --- */}
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-20 gap-12 border-b border-white/5 pb-16 relative z-10">
+          <div className="flex items-center gap-10">
+            <motion.div whileHover={{ scale: 1.05 }} className="p-8 bg-cyan-500 rounded-[45px] text-slate-950 shadow-glow relative">
+               <UserCircle size={56} />
+               <div className="absolute -bottom-2 -right-2 bg-slate-950 p-2 rounded-full border border-cyan-500/50">
+                  <ShieldCheck size={18} className="text-cyan-500" />
+               </div>
+            </motion.div>
+            <div className="text-left space-y-2">
+              <h2 className="text-5xl font-black uppercase italic text-white tracking-tighter leading-none">
+                {ticket.name}
+              </h2>
+              <div className="flex flex-wrap gap-4 items-center">
+                 <span className="text-cyan-500 text-[12px] font-black uppercase tracking-[0.6em] italic">
+                   Protocolo: {ticket.id}
+                 </span>
+                 <span className="text-slate-500 text-[12px] font-black uppercase tracking-[0.4em] italic">
+                   • Lion Rising Ecosystem
+                 </span>
               </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-8 bg-white/5 rounded-[40px] border border-white/5 text-center hover:border-cyan-500/20 transition-all">
-              <TrendingUp size={24} className="text-cyan-500 mx-auto mb-3" />
-              <p className="text-[8px] font-black uppercase text-slate-500 tracking-widest">Match IA</p>
-              <p className="text-2xl font-black text-white italic tracking-tighter">97%</p>
-            </div>
-            <div className="p-8 bg-white/5 rounded-[40px] border border-white/5 text-center hover:border-purple-500/20 transition-all">
-              <Clock size={24} className="text-purple-500 mx-auto mb-3" />
-              <p className="text-[8px] font-black uppercase text-slate-500 tracking-widest">SLA Atendimento</p>
-              <p className="text-2xl font-black text-white italic tracking-tighter">48h</p>
-            </div>
+          <div className="bg-slate-950 px-10 py-6 rounded-[35px] border border-white/5 shadow-inner group">
+             <p className="text-[10px] uppercase text-slate-600 font-black tracking-widest mb-3 italic flex items-center gap-2">
+               <Activity size={12} className="text-cyan-500"/> Status de Processo:
+             </p>
+             <p className="text-cyan-500 font-black uppercase italic text-2xl tracking-tighter flex items-center gap-3">
+               {ticket.status} 
+               <ArrowUpRight size={20} className="opacity-30 group-hover:opacity-100 transition-all" />
+             </p>
           </div>
         </div>
 
-        {/* COLUNA: PIPELINE E ERP */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* PIPELINE VISUAL */}
-          <div className="bg-slate-900 p-12 rounded-[50px] border border-white/5 shadow-2xl">
-            <h3 className="text-xl font-black uppercase italic mb-12 text-slate-400 tracking-widest flex items-center gap-3">
-              <FileText size={20} className="text-cyan-500" /> Pipeline de Evolução
-            </h3>
-            
-            <div className="relative pt-4 pb-8">
-              <div className="absolute top-9 left-0 w-full h-[2px] bg-white/5 hidden md:block" />
-              <div 
-                className="absolute top-9 left-0 h-[2px] bg-cyan-500 shadow-[0_0_20px_#06b6d4] transition-all duration-1000 hidden md:block" 
-                style={{ width: getProgressWidth() }}
-              />
-
-              <div className="relative flex flex-col md:flex-row justify-between gap-12">
-                {steps.map((step, idx) => {
-                  const isCompleted = ticket.status === 'Contratado' || (ticket.status === step) || (idx === 0);
-                  return (
-                    <div key={step} className="flex flex-col items-center group relative z-10">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-700 ${isCompleted ? 'bg-cyan-500 border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.5)] scale-110' : 'bg-slate-950 border-white/10'}`}>
-                        {isCompleted ? <CheckCircle2 size={20} className="text-slate-950" /> : <span className="text-[10px] font-bold text-slate-700">{idx + 1}</span>}
-                      </div>
-                      <span className={`mt-5 text-[9px] font-black uppercase tracking-[0.2em] text-center max-w-[80px] leading-tight ${isCompleted ? 'text-white' : 'text-slate-600'}`}>
-                        {step}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* MÓDULO ERP DE CONTRATO */}
-          <AnimatePresence>
-            {ticket.status === 'Contratado' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-cyan-500/5 border border-cyan-500/20 p-12 rounded-[50px] relative overflow-hidden"
-              >
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
-                  <div className="space-y-8 flex-grow">
-                    <div className="flex items-center gap-4">
-                      <ShieldCheck className="text-cyan-500 shadow-glow" size={32} />
-                      <h3 className="text-3xl font-black uppercase italic text-white tracking-tighter">Contrato <span className="text-cyan-500">Ativado</span></h3>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <div className="flex items-center gap-5">
-                        <div className="p-3 bg-white/5 rounded-2xl"><Briefcase className="text-slate-400" size={24} /></div>
-                        <div>
-                          <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-1">Projeto Alocado</p>
-                          <p className="text-sm font-black text-white uppercase italic">{ticket.project_name || "Alocação Direta Lion"}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-5">
-                        <div className="p-3 bg-white/5 rounded-2xl"><Wallet className="text-slate-400" size={24} /></div>
-                        <div>
-                          <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-1">Valor Mensal (R$)</p>
-                          <p className="text-lg font-black text-cyan-500 italic">R$ {ticket.monthly_value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-5">
-                        <div className="p-3 bg-white/5 rounded-2xl"><Calendar className="text-slate-400" size={24} /></div>
-                        <div>
-                          <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-1">Vigência Ativa</p>
-                          <p className="text-sm font-bold text-white uppercase">{ticket.contract_start} » {ticket.contract_end || "Indeterminado"}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-5">
-                        <div className="p-3 bg-white/5 rounded-2xl"><CheckCircle2 className="text-green-500" size={24} /></div>
-                        <div>
-                          <p className="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-1">Status de Pagamento</p>
-                          <p className="text-[10px] font-black text-green-500 uppercase px-3 py-1 bg-green-500/10 rounded-lg inline-block">{ticket.payment_status || "Em Processamento"}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-950 p-10 rounded-[40px] border border-white/10 text-center min-w-[220px] shadow-2xl relative z-10">
-                    <p className="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-widest">Próxima Fatura</p>
-                    <p className="text-4xl font-black text-white italic tracking-tighter mb-6">05/FEV</p>
-                    <button className="w-full text-[10px] font-black uppercase text-cyan-500 border border-cyan-500/30 px-6 py-4 rounded-2xl hover:bg-cyan-500 hover:text-slate-950 transition-all duration-500 tracking-[0.2em]">
-                      Baixar Invoice
-                    </button>
-                  </div>
+        {/* --- TIMELINE DE EVOLUÇÃO --- */}
+        <div className="mb-24 px-6 md:px-12 relative z-10">
+          <div className="flex justify-between relative">
+            <div className="absolute top-[28px] left-0 w-full h-[2px] bg-white/5 z-0" />
+            {steps.map((s, i) => (
+              <div key={i} className="relative z-10 flex flex-col items-center gap-6 group">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-1000 border-2 ${s.active ? 'bg-cyan-500 border-cyan-400 text-slate-950 shadow-glow scale-110' : 'bg-slate-950 border-white/5 text-slate-800'}`}>
+                  {s.active ? <CheckCircle2 size={28} /> : <Clock size={28} />}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* MENSAGEM DE AUDITORIA */}
-          {ticket.status !== 'Contratado' && (
-            <div className="p-12 bg-white/5 rounded-[50px] border border-white/5 text-center italic relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-30" />
-               <p className="text-slate-500 text-sm font-light relative z-10 leading-relaxed">
-                Os dados deste protocolo estão sob auditoria TAMMY RH | HUNTING. <br />
-                As informações financeiras e contratuais serão liberadas automaticamente após a validação do RH.
-              </p>
-            </div>
-          )}
+                <p className={`text-[11px] font-black uppercase tracking-widest ${s.active ? 'text-white' : 'text-slate-700'}`}>
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+
+        {/* --- GRID DE DADOS TÉCNICOS E PSICOMÉTRICOS --- */}
+        <div className="grid lg:grid-cols-3 gap-8 text-left relative z-10">
+           
+           <motion.div variants={cardVariants} className="bg-slate-950 p-10 rounded-[60px] border border-white/5 shadow-inner group hover:border-cyan-500/20 transition-all">
+              <div className="flex justify-between items-start mb-8">
+                <div className="p-4 bg-cyan-500/5 rounded-2xl text-cyan-500"><MapPin size={24}/></div>
+                <Globe size={16} className="text-slate-800 animate-spin-slow" />
+              </div>
+              <p className="text-[10px] font-black text-slate-600 uppercase mb-3 tracking-[0.3em] italic">Base Regional:</p>
+              <p className="text-white font-black text-lg uppercase italic leading-tight tracking-tighter">
+                {ticket.region || "Em Análise"}
+              </p>
+              <p className="text-[10px] text-slate-700 mt-4 font-mono uppercase tracking-widest italic">
+                {ticket.logradouro ? `${ticket.logradouro}, ${ticket.numero}` : "Aguardando Endereço"}
+              </p>
+           </motion.div>
+
+           <motion.div variants={cardVariants} className="bg-slate-950 p-10 rounded-[60px] border border-white/5 shadow-inner group hover:border-purple-500/20 transition-all">
+              <div className="flex justify-between items-start mb-8">
+                <div className="p-4 bg-purple-500/5 rounded-2xl text-purple-500"><Award size={24}/></div>
+                <TrendingUp size={16} className="text-slate-800" />
+              </div>
+              <p className="text-[10px] font-black text-slate-600 uppercase mb-3 tracking-[0.3em] italic">Vertical Técnica:</p>
+              <p className="text-white font-black text-lg uppercase italic leading-tight tracking-tighter">
+                {ticket.area} • {ticket.seniority}
+              </p>
+              <div className="mt-6 flex items-center gap-4">
+                 <div className="flex-grow bg-white/5 h-1.5 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(Number(ticket.tech_level) || 1) * 20}%` }}
+                      transition={{ duration: 2 }}
+                      className="bg-purple-500 h-full rounded-full shadow-glow" 
+                    />
+                 </div>
+                 <span className="text-purple-500 font-black text-xs font-mono">{ticket.tech_level}/5</span>
+              </div>
+           </motion.div>
+
+           <motion.div variants={cardVariants} className="bg-slate-950 p-10 rounded-[60px] border border-white/5 shadow-inner group hover:border-orange-500/20 transition-all">
+              <div className="flex justify-between items-start mb-8">
+                <div className="p-4 bg-orange-500/5 rounded-2xl text-orange-500"><Target size={24}/></div>
+                <Fingerprint size={16} className="text-slate-800" />
+              </div>
+              <p className="text-[10px] font-black text-slate-600 uppercase mb-3 tracking-[0.3em] italic">Análise Comportamental:</p>
+              <p className="text-white font-black text-xl uppercase italic tracking-tighter">
+                {ticket.behavioral_profile || "Auditando..."}
+              </p>
+              <div className="mt-5 p-3 bg-white/[0.02] rounded-xl border border-white/5">
+                <p className="text-[9px] text-slate-500 italic leading-relaxed">Match validado para squads de alta pressão bancária.</p>
+              </div>
+           </motion.div>
+        </div>
+
+        {/* --- SEÇÃO ESPECIAL: ALOCAÇÃO ERP (CONTRATADO) --- */}
+        <AnimatePresence>
+          {ticket.status === 'Contratado' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mt-12 grid md:grid-cols-2 gap-8 relative z-10"
+            >
+              <div className="bg-gradient-to-br from-green-500/10 to-transparent p-12 rounded-[70px] border border-green-500/20 relative overflow-hidden shadow-glow">
+                <div className="absolute -right-10 -top-10 opacity-5 text-green-500 rotate-12"><FileCheck size={200} /></div>
+                <h4 className="text-[11px] font-black text-green-500 uppercase mb-8 tracking-[0.4em] italic flex items-center gap-4">
+                  <Briefcase size={18}/> Alocação Lion Rising
+                </h4>
+                <div className="space-y-8 relative z-10">
+                   <div className="border-l-2 border-green-500/30 pl-8">
+                      <p className="text-[9px] uppercase text-slate-500 font-bold tracking-widest mb-1 italic">Cliente & Squad Ativa:</p>
+                      <p className="text-white font-black text-xl uppercase italic tracking-tighter">
+                        {ticket.client_assigned} <span className="text-slate-600 mx-2">/</span> {ticket.project_name}
+                      </p>
+                   </div>
+                   <div className="flex gap-12 border-l-2 border-green-500/30 pl-8">
+                      <div>
+                        <p className="text-[9px] uppercase text-slate-500 font-bold tracking-widest mb-1 italic">Vigência Início:</p>
+                        <p className="text-white font-black text-md italic font-mono">{ticket.contract_start}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase text-slate-500 font-bold tracking-widest mb-1 italic">Vigência Término:</p>
+                        <p className="text-white font-black text-md italic font-mono">{ticket.contract_end || "INDETERMINADO"}</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-cyan-500/10 to-transparent p-12 rounded-[70px] border border-cyan-500/20 relative overflow-hidden">
+                <div className="absolute -right-10 -top-10 opacity-5 text-cyan-500 -rotate-12"><Wallet size={200} /></div>
+                <h4 className="text-[11px] font-black text-cyan-500 uppercase mb-8 tracking-[0.4em] italic flex items-center gap-4">
+                  <ShieldCheck size={18}/> Backoffice & Auditoria
+                </h4>
+                <div className="space-y-8 relative z-10">
+                   <div className="border-l-2 border-cyan-500/30 pl-8">
+                      <p className="text-[9px] uppercase text-slate-500 font-bold tracking-widest mb-1 italic">Faturamento Mensal:</p>
+                      <p className="text-white font-black text-2xl uppercase italic tracking-tighter flex items-center gap-3">
+                        R$ {ticket.monthly_value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                   </div>
+                   <div className="flex gap-10 border-l-2 border-cyan-500/30 pl-8">
+                      <div>
+                        <p className="text-[9px] uppercase text-slate-500 font-bold tracking-widest mb-1 italic">Status de Repasse:</p>
+                        <p className="text-cyan-500 font-black text-md italic flex items-center gap-3">
+                          <CheckCircle2 size={20} className="text-green-500 animate-pulse"/> {ticket.payment_status || "AUDITADO"}
+                        </p>
+                      </div>
+                      <div className="flex items-end">
+                         <button className="flex items-center gap-2 text-[9px] font-black uppercase text-white bg-white/5 px-5 py-3 rounded-2xl border border-white/5 hover:bg-cyan-500 hover:text-slate-950 transition-all italic tracking-widest shadow-xl">
+                            <Download size={14}/> Docs
+                         </button>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* --- ÁREA DE COMUNICAÇÃO DIRETA --- */}
+        <motion.div variants={cardVariants} className="mt-12 p-12 bg-white/5 border border-white/5 rounded-[60px] flex flex-col md:flex-row items-center gap-12 group relative overflow-hidden">
+           <Zap className="text-cyan-500 animate-pulse shrink-0" size={48} />
+           <div className="text-left relative z-10 flex-grow">
+              <p className="text-[10px] text-white font-black uppercase italic tracking-[0.4em] mb-3 flex items-center gap-3">
+                 <ShieldAlert size={14} className="text-cyan-500"/> Diretriz de Governança Lion Solution
+              </p>
+              <p className="text-sm text-slate-400 italic leading-loose font-light max-w-4xl">
+                {ticket.status === 'Contratado' 
+                  ? "Sua operação técnica está ativa e auditada. O acesso aos repositórios e squads do cliente está liberado via VPN corporativa. Mantenha seus logs de horas atualizados para o fechamento mensal no ERP." 
+                  : ticket.status === 'Aprovado' 
+                  ? "Parabéns! Seu perfil superou as métricas de elite da Lion Solution. O contrato de alocação está em fase de geração digital via DocuSign para sua assinatura e posterior ativação de squad." 
+                  : "Seu protocolo discovery está em processamento de inteligência. Estamos cruzando sua matriz comportamental DISC e seu nível técnico com as squads de alta performance da Deskcorp e Banco da Amazônia."}
+              </p>
+           </div>
+           <div className="shrink-0 flex gap-4">
+              <button className="p-6 bg-slate-950 rounded-3xl border border-white/5 text-slate-500 hover:text-white transition-all shadow-2xl group/btn">
+                 <Mail size={26} className="group-hover/btn:scale-110 transition-transform"/>
+              </button>
+              <button className="px-10 py-6 bg-cyan-500 text-slate-950 rounded-[28px] font-black uppercase text-[10px] tracking-[0.2em] shadow-glow hover:bg-white transition-all italic">
+                 Abrir Chamado
+              </button>
+           </div>
+        </motion.div>
+
+        {/* Footer do Dashboard */}
+        <div className="mt-16 pt-8 border-t border-white/5 flex justify-between items-center text-[8px] font-black uppercase text-slate-700 tracking-[0.5em] italic">
+           <span>Auditado por B2Y Group Systems & Governance Belém/PA</span>
+           <span className="flex items-center gap-2"><Lock size={10}/> Conexão Segura SSL v5.0</span>
+        </div>
+      </motion.div>
     </section>
   );
 }

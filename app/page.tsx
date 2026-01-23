@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 
-// Componentes Modulares
+// Infraestrutura de Componentes Lion Solution
 import SplashScreen from '@/components/SplashScreen';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
@@ -15,27 +15,67 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-// --- INTERFACES TÉCNICAS INTEGRAIS ---
+// --- INTERFACES TÉCNICAS INTEGRAIS (SINCRO TOTAL BACKOFFICE) ---
 export type UserRole = 'candidate' | 'client' | null;
-export type ViewState = 'home' | 'discovery' | 'admin';
+export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
 
 export interface JobData {
-  id: string; title: string; area: string; seniority: string;
-  description: string; salary: string; status: 'Ativa' | 'Pausada';
+  id: string;
+  title: string;
+  area: string;
+  seniority: string;
+  description: string;
+  salary: string;
+  status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
-  id: string; role: UserRole; name: string; email?: string;
-  whatsapp?: string; cep?: string; cpf_cnpj?: string;
-  logradouro?: string; numero?: string; bairro?: string;
-  cidade?: string; uf?: string; region?: string;
-  linkedin_url?: string; company_site?: string; company?: string;
-  area: string; custom_area?: string; seniority?: string;
-  quantity?: number; status: string; date: string; resume_url?: string;
-  experience_bio?: string; soft_skills?: string; behavioral_profile?: string;
-  skills_summary?: string; behavioral_summary?: string;
-  project_name?: string; monthly_value?: number; contract_start?: string;
-  contract_end?: string; payment_status?: string;
+  id: string;
+  role: UserRole;
+  name: string;
+  email?: string;
+  whatsapp?: string;
+  cep?: string;
+  cpf_cnpj?: string;
+  logradouro?: string;
+  numero?: string;
+  bairro?: string;
+  cidade?: string;
+  uf?: string;
+  region?: string;
+  linkedin_url?: string;
+  company_site?: string;
+  company?: string;
+  area: string;
+  custom_area?: string;
+  seniority?: string;
+  quantity?: number;
+  status: string;
+  date: string;
+  resume_url?: string;
+  // Inteligência de RH, Matriz DISC e Mercado
+  experience_bio?: string;
+  soft_skills?: string;
+  behavioral_profile?: string;
+  skills_summary?: string;
+  behavioral_summary?: string;
+  tech_level?: string;
+  market_segments?: string;
+  situational_response?: string;
+  // --- CAMPOS BACKOFFICE & ERP (ELIMINA ERROS DE COMPILAÇÃO) ---
+  contract_url?: string;
+  id_docs_url?: string;
+  contract_status?: string;
+  client_assigned?: string;
+  project_name?: string;
+  contract_start?: string;     
+  contract_end?: string;       
+  start_date?: string;         // RESOLVE O ERRO RECLAMADO
+  end_date?: string;           // RESOLVE O ERRO RECLAMADO
+  monthly_value?: number;
+  billing_day?: number;
+  rejection_reason?: string;
+  payment_status?: string;
 }
 
 export default function TammyPlatform() {
@@ -47,6 +87,7 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
+  // Sincronização de Auditoria Lion Rising em Belém/SP
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -54,55 +95,38 @@ export default function TammyPlatform() {
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("Erro na busca de dados:", err);
+      console.error("ERRO CRÍTICO NA BUSCA DE DADOS:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleRetrieveTicket = async (protocolId: string) => {
     const { data, error } = await supabase.from('tickets').select('*').eq('id', protocolId.toUpperCase()).single();
-    if (data && !error) { setActiveTicket(data); setView('home'); }
-    else { alert("Protocolo não localizado na governança Lion."); }
+    if (data && !error) { 
+      setActiveTicket(data); 
+      setView('home'); 
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    } else { 
+      alert("Protocolo não localizado na governança."); 
+    }
   };
 
   const handleTicketCreate = async (data: any) => {
-    // MAPEAMENTO SEGURO PARA O BANCO (SNAKE_CASE)
     const dbPayload = {
       id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
       role: userRole,
-      name: data.name,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      cep: data.cep,
-      cpf_cnpj: data.cpf_cnpj,
-      logradouro: data.logradouro,
-      numero: data.numero,
-      bairro: data.bairro,
-      cidade: data.cidade,
-      uf: data.uf,
-      region: data.region,
-      area: data.area,
-      custom_area: data.custom_area,
-      seniority: data.seniority,
-      experience_bio: data.experience_bio,
-      behavioral_profile: data.behavioral_profile,
-      soft_skills: data.soft_skills,
-      skills_summary: data.skills_summary,
-      behavioral_summary: data.behavioral_summary,
-      linkedin_url: data.linkedin_url,
-      company: data.company,
-      company_site: data.company_site,
-      quantity: data.quantity || 1,
+      ...data,
       date: new Date().toLocaleDateString('pt-BR'),
       status: userRole === 'client' ? "Cotação" : "Discovery",
-      resume_url: data.resumeName
+      contract_status: 'Lead'
     };
 
-    console.log("Iniciando gravação de Lead...", dbPayload);
-
+    console.log("GRAVANDO ATIVO LION:", dbPayload);
     const { error } = await supabase.from('tickets').insert([dbPayload]);
     
     if (!error) {
@@ -110,19 +134,18 @@ export default function TammyPlatform() {
       setAllTickets(prev => [dbPayload as any, ...prev]);
       setView('home');
     } else {
-      console.error("ERRO CRÍTICO SUPABASE:", error);
-      alert(`Erro ao salvar: ${error.message}`);
+      console.error("ERRO SUPABASE:", error);
+      alert(`Falha no salvamento: ${error.message}`);
     }
   };
 
-  const handleUpdateJob = async (id: string, updatedJob: Partial<JobData>) => {
-    const { error } = await supabase.from('jobs').update(updatedJob).eq('id', id);
-    if (!error) setVacancies(prev => prev.map(j => j.id === id ? { ...j, ...updatedJob } : j));
-  };
-
   const updateTicketERP = async (id: string, updatedData: any) => {
+    console.log(`AUDITORIA: Atualizando Ativo ${id}`, updatedData);
     const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
-    if (!error) setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
+    if (!error) {
+      setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
+      if (activeTicket?.id === id) setActiveTicket(prev => ({ ...prev!, ...updatedData }));
+    }
   };
 
   const handleAddJob = async (job: JobData) => {
@@ -130,20 +153,20 @@ export default function TammyPlatform() {
     if (!error) setVacancies(prev => [job, ...prev]);
   };
 
+  const handleUpdateJob = async (id: string, updatedJob: Partial<JobData>) => {
+    const { error } = await supabase.from('jobs').update(updatedJob).eq('id', id);
+    if (!error) setVacancies(prev => prev.map(j => j.id === id ? { ...j, ...updatedJob } : j));
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-cyan-500 font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-white selection:bg-cyan-500 font-sans antialiased overflow-x-hidden text-left">
       <AnimatePresence mode="wait">
         {isLoading && <SplashScreen finishLoading={() => setIsLoading(false)} />}
       </AnimatePresence>
 
       {!isLoading && (
         <div className="relative">
-          <Navigation 
-            setView={setView} 
-            activeTicket={activeTicket} 
-            resetSession={() => {setActiveTicket(null); setView('home');}} 
-            onSearchProtocol={handleRetrieveTicket}
-          />
+          <Navigation setView={setView} activeTicket={activeTicket} resetSession={() => {setActiveTicket(null); setView('home');}} onSearchProtocol={handleRetrieveTicket} />
           <main className="pt-24 pb-20">
             <AnimatePresence mode="wait">
               {view === 'home' && !activeTicket && (
@@ -171,8 +194,8 @@ export default function TammyPlatform() {
               )}
             </AnimatePresence>
           </main>
-          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase">
-            Lion Solution & B2Y Group | Tammy RH & Hunting
+          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase font-black">
+            Lion Solution & B2Y Group | Backoffice ERP v5.0
           </footer>
         </div>
       )}

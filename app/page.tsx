@@ -15,10 +15,6 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-/**
- * @interface TicketData
- * @description Contrato de dados integral v8.8 - Governança Lion & B2Y.
- */
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
 
@@ -51,23 +47,20 @@ export interface TicketData {
   status: string;
   date: string;
   resume_url?: string;
-  // --- INTELIGÊNCIA PSICOMÉTRICA (DISC + OCEAN) ---
+  // --- INTELIGÊNCIA PSICOMÉTRICA E RH ---
+  birth_date?: string;       
+  marital_status?: string; 
+  has_children?: string;    
+  num_children?: number;    
+  hobbies?: string;         
+  salary_expectation?: string; 
+  availability?: string;      
   experience_bio?: string;
   soft_skills?: string;
   behavioral_profile?: string; 
   disc_q1?: string; disc_q2?: string; disc_q3?: string; disc_q4?: string;
   disc_q5?: string; disc_q6?: string; disc_q7?: string; disc_q8?: string;
   disc_q9?: string; disc_q10?: string;
-  marital_status?: string; 
-  hobbies?: string;         
-  has_children?: string;    
-  num_children?: number;    
-  skills_summary?: string;
-  behavioral_summary?: string;
-  tech_level?: string;
-  market_segments?: string;
-  situational_response?: string;
-  // Big Five (OCEAN)
   ocean_openness?: number;
   ocean_conscientiousness?: number;
   ocean_extraversion?: number;
@@ -77,21 +70,15 @@ export interface TicketData {
   company_name?: string;
   job_title?: string;
   job_description?: string;
-  // --- GESTÃO BACKOFFICE & BALANÇO FINANCEIRO ---
-  contract_url?: string;
-  id_docs_url?: string;
+  // --- GESTÃO BACKOFFICE ---
   contract_status?: string;
   employment_status?: string;
   client_assigned?: string;
   project_name?: string;
   contract_start?: string;
-  contract_end?: string;
-  monthly_value?: number;
   first_salary?: number;
   hiring_fee?: number;
   hiring_notes?: string;
-  billing_day?: number;
-  payment_status?: string;
 }
 
 export default function TammyPlatform() {

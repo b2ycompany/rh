@@ -15,7 +15,10 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-// --- INTERFACES TÉCNICAS INTEGRAIS (SINCRO TOTAL BACKOFFICE) ---
+/**
+ * @interface TicketData
+ * @description Contrato de dados integral para governança Lion Solution.
+ */
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
 
@@ -53,7 +56,7 @@ export interface TicketData {
   status: string;
   date: string;
   resume_url?: string;
-  // Inteligência de RH, Matriz DISC e Mercado
+  // Inteligência de RH, DISC e OCEAN
   experience_bio?: string;
   soft_skills?: string;
   behavioral_profile?: string;
@@ -62,19 +65,26 @@ export interface TicketData {
   tech_level?: string;
   market_segments?: string;
   situational_response?: string;
-  // --- CAMPOS BACKOFFICE & ERP (ELIMINA ERROS DE COMPILAÇÃO) ---
+  marital_status?: string;
+  hobbies?: string;
+  // Métricas OCEAN
+  ocean_openness?: number;
+  ocean_conscientiousness?: number;
+  ocean_extraversion?: number;
+  ocean_agreeableness?: number;
+  ocean_neuroticism?: number;
+  // --- GESTÃO BACKOFFICE & ERP (ELIMINA ERROS DE COMPILAÇÃO) ---
   contract_url?: string;
   id_docs_url?: string;
   contract_status?: string;
+  employment_status?: string;
   client_assigned?: string;
   project_name?: string;
-  contract_start?: string;     
-  contract_end?: string;       
-  start_date?: string;         // RESOLVE O ERRO RECLAMADO
-  end_date?: string;           // RESOLVE O ERRO RECLAMADO
-  monthly_value?: number;
+  contract_start?: string;
+  contract_end?: string;
+  first_salary?: number;
+  hiring_fee?: number;
   billing_day?: number;
-  rejection_reason?: string;
   payment_status?: string;
 }
 
@@ -87,7 +97,7 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
-  // Sincronização de Auditoria Lion Rising em Belém/SP
+  // Sincronização em tempo real com auditoria de integridade
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -101,9 +111,7 @@ export default function TammyPlatform() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleRetrieveTicket = async (protocolId: string) => {
     const { data, error } = await supabase.from('tickets').select('*').eq('id', protocolId.toUpperCase()).single();
@@ -123,10 +131,10 @@ export default function TammyPlatform() {
       ...data,
       date: new Date().toLocaleDateString('pt-BR'),
       status: userRole === 'client' ? "Cotação" : "Discovery",
-      contract_status: 'Lead'
+      contract_status: 'Lead',
+      employment_status: 'Disponível'
     };
 
-    console.log("GRAVANDO ATIVO LION:", dbPayload);
     const { error } = await supabase.from('tickets').insert([dbPayload]);
     
     if (!error) {
@@ -146,16 +154,6 @@ export default function TammyPlatform() {
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
       if (activeTicket?.id === id) setActiveTicket(prev => ({ ...prev!, ...updatedData }));
     }
-  };
-
-  const handleAddJob = async (job: JobData) => {
-    const { error } = await supabase.from('jobs').insert([job]);
-    if (!error) setVacancies(prev => [job, ...prev]);
-  };
-
-  const handleUpdateJob = async (id: string, updatedJob: Partial<JobData>) => {
-    const { error } = await supabase.from('jobs').update(updatedJob).eq('id', id);
-    if (!error) setVacancies(prev => prev.map(j => j.id === id ? { ...j, ...updatedJob } : j));
   };
 
   return (
@@ -189,13 +187,13 @@ export default function TammyPlatform() {
               )}
               {view === 'admin' && (
                 <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
-                  <AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={handleAddJob} onUpdateJob={handleUpdateJob} onUpdateERP={updateTicketERP} />
+                  <AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={()=>{}} onUpdateJob={()=>{}} onUpdateERP={updateTicketERP} />
                 </motion.div>
               )}
             </AnimatePresence>
           </main>
           <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase font-black">
-            Lion Solution & B2Y Group | Backoffice ERP v5.0
+            Lion Solution & B2Y Group | Backoffice ERP v6.5
           </footer>
         </div>
       )}

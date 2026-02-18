@@ -76,7 +76,7 @@ export default function Dashboard({ ticket }: { ticket: TicketData }) {
            <Zap className="text-cyan-500 animate-pulse shrink-0 shadow-glow" size={48} />
            <div className="text-left relative z-10 flex-grow">
               <p className="text-[10px] text-white font-black uppercase italic tracking-[0.4em] mb-3 flex items-center gap-3"><ShieldAlert size={14} className="text-cyan-500"/> Diretriz Lion Solution</p>
-              <p className="text-sm text-slate-400 italic leading-loose font-light max-w-4xl">{ticket.status === 'Contratado' ? "Sua operação técnica está ativa e auditada. Mantenha seus registros de horas atualizados para faturamento." : "Seu protocolo discovery está em processamento de inteligência psicométrica."}</p>
+              <p className="text-sm text-slate-400 italic leading-loose font-light max-w-4xl">{ticket.status === 'Contratado' ? "Sua Teste operação técnica está ativa e auditada. Mantenha seus registros de horas atualizados para faturamento." : "Seu protocolo discovery está em processamento de inteligência psicométrica."}</p>
            </div>
            <div className="shrink-0 flex gap-4"><button className="p-6 bg-slate-950 rounded-3xl border border-white/5 text-slate-500 hover:text-white transition-all shadow-2xl group/btn"><Mail size={26} className="group-hover/btn:scale-110 transition-transform"/></button><button className="px-10 py-6 bg-cyan-500 text-slate-950 rounded-[28px] font-black uppercase text-[10px] shadow-glow hover:bg-white transition-all italic">Suporte VIP</button></div>
         </motion.div>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 
-// Infraestrutura de Componentes Lion Solution
+// Infraestrutura Lion Solution
 import SplashScreen from '@/components/SplashScreen';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
@@ -17,7 +17,7 @@ import JobBoard from '@/components/JobBoard';
 
 /**
  * @interface TicketData
- * @description Contrato de dados integral para o ecossistema de governança Lion Solution.
+ * @description Contrato de dados integral v8.8 - Governança Lion & B2Y.
  */
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
@@ -51,43 +51,46 @@ export interface TicketData {
   status: string;
   date: string;
   resume_url?: string;
-  // --- INTELIGÊNCIA PSICOMÉTRICA DE ELITE (DISC + OCEAN) ---
+  // --- INTELIGÊNCIA PSICOMÉTRICA (DISC + OCEAN) ---
   experience_bio?: string;
   soft_skills?: string;
-  behavioral_profile?: string; // DISC Principal Resultante
+  behavioral_profile?: string; 
   disc_q1?: string; disc_q2?: string; disc_q3?: string; disc_q4?: string;
+  disc_q5?: string; disc_q6?: string; disc_q7?: string; disc_q8?: string;
+  disc_q9?: string; disc_q10?: string;
   marital_status?: string; 
   hobbies?: string;         
-  has_children?: string;    // RESOLVE O ERRO DE COMPILAÇÃO
+  has_children?: string;    
   num_children?: number;    
   skills_summary?: string;
   behavioral_summary?: string;
   tech_level?: string;
   market_segments?: string;
   situational_response?: string;
-  // Métricas Big Five (OCEAN)
+  // Big Five (OCEAN)
   ocean_openness?: number;
   ocean_conscientiousness?: number;
   ocean_extraversion?: number;
   ocean_agreeableness?: number;
   ocean_neuroticism?: number;
   // --- FLUXO CONTRATANTE ---
-  job_title?: string;       // RESOLVE O ERRO DE COMPILAÇÃO
+  company_name?: string;
+  job_title?: string;
   job_description?: string;
-  // --- GESTÃO BACKOFFICE, ERP & BALANÇO FINANCEIRO ---
+  // --- GESTÃO BACKOFFICE & BALANÇO FINANCEIRO ---
   contract_url?: string;
   id_docs_url?: string;
-  contract_status?: string;    // Ativo / Pausado
-  employment_status?: string;  // Empregado / Desligado
-  client_assigned?: string;    
-  project_name?: string;       
-  contract_start?: string;     
-  contract_end?: string;       
-  monthly_value?: number;      
-  first_salary?: number;       // Base para o balanço Lion
-  hiring_fee?: number;         // Receita única Lion (50/65/75%)
-  hiring_notes?: string;       
-  billing_day?: number;        
+  contract_status?: string;
+  employment_status?: string;
+  client_assigned?: string;
+  project_name?: string;
+  contract_start?: string;
+  contract_end?: string;
+  monthly_value?: number;
+  first_salary?: number;
+  hiring_fee?: number;
+  hiring_notes?: string;
+  billing_day?: number;
   payment_status?: string;
 }
 
@@ -107,7 +110,7 @@ export default function TammyPlatform() {
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("ERRO CRÍTICO NA BUSCA DE DADOS:", err);
+      console.error("ERRO CRÍTICO NA BUSCA:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
@@ -118,30 +121,22 @@ export default function TammyPlatform() {
   const handleRetrieveTicket = async (protocolId: string) => {
     const { data, error } = await supabase.from('tickets').select('*').eq('id', protocolId.toUpperCase()).single();
     if (data && !error) { 
-      setActiveTicket(data); 
-      setView('home'); 
-      window.scrollTo({ top: 0, behavior: 'smooth' }); 
-    } else { alert("Protocolo não localizado na governança."); }
+      setActiveTicket(data); setView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    } else { alert("Protocolo não localizado."); }
   };
 
   const handleTicketCreate = async (data: any) => {
     const dbPayload = {
       id: `LION-${Math.random().toString(36).substr(2, 7).toUpperCase()}`,
-      role: userRole,
-      ...data,
+      role: userRole, ...data,
       date: new Date().toLocaleDateString('pt-BR'),
       status: userRole === 'client' ? "Pendente" : "Discovery",
       contract_status: 'Lead'
     };
-
     const { error } = await supabase.from('tickets').insert([dbPayload]);
     if (!error) {
-      setActiveTicket(dbPayload as any);
-      setAllTickets(prev => [dbPayload as any, ...prev]);
-      setView('home');
-    } else {
-      alert(`Falha no salvamento: ${error.message}`);
-    }
+      setActiveTicket(dbPayload as any); setAllTickets(prev => [dbPayload as any, ...prev]); setView('home');
+    } else { alert(`Erro: ${error.message}`); }
   };
 
   const updateTicketERP = async (id: string, updatedData: any) => {
@@ -154,10 +149,7 @@ export default function TammyPlatform() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-cyan-500 font-sans antialiased overflow-x-hidden text-left">
-      <AnimatePresence mode="wait">
-        {isLoading && <SplashScreen finishLoading={() => setIsLoading(false)} />}
-      </AnimatePresence>
-
+      <AnimatePresence mode="wait">{isLoading && <SplashScreen finishLoading={() => setIsLoading(false)} />}</AnimatePresence>
       {!isLoading && (
         <div className="relative">
           <Navigation setView={setView} activeTicket={activeTicket} resetSession={() => {setActiveTicket(null); setView('home');}} onSearchProtocol={handleRetrieveTicket} />
@@ -172,25 +164,17 @@ export default function TammyPlatform() {
                 </motion.div>
               )}
               {view === 'home' && activeTicket && (
-                <motion.div key="d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}>
-                  <Dashboard ticket={activeTicket} />
-                </motion.div>
+                <motion.div key="d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1 }}><Dashboard ticket={activeTicket} /></motion.div>
               )}
               {view === 'discovery' && (
-                <motion.div key="disc" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}>
-                  <Discovery role={userRole} initialData={formData} onSubmit={handleTicketCreate} />
-                </motion.div>
+                <motion.div key="disc" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1 }}><Discovery role={userRole} initialData={formData} onSubmit={handleTicketCreate} /></motion.div>
               )}
               {view === 'admin' && (
-                <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}>
-                  <AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={()=>{}} onUpdateJob={()=>{}} onUpdateERP={updateTicketERP} />
-                </motion.div>
+                <motion.div key="adm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1 }}><AdminRH tickets={allTickets} vacancies={vacancies} onAddJob={()=>{}} onUpdateJob={()=>{}} onUpdateERP={updateTicketERP} /></motion.div>
               )}
             </AnimatePresence>
           </main>
-          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase font-black">
-            Lion Solution & B2Y Group | Backoffice ERP v8.0
-          </footer>
+          <footer className="container mx-auto px-6 py-12 border-t border-white/5 text-center italic text-[9px] text-slate-700 tracking-[0.5em] uppercase font-black">Lion Solution & B2Y Group | Backoffice ERP v8.8</footer>
         </div>
       )}
     </div>

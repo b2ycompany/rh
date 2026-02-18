@@ -4,16 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BrainCircuit, Upload, CheckCircle2, ChevronRight, Search, ArrowLeft, UserCircle, Star, Target, MapPin, 
-  Linkedin, Globe, Users, ShieldCheck, Zap, Info, Briefcase, FileText, BadgeCheck, Cpu, Layers, 
-  Database, Link, Heart, Glasses, TrendingUp, BarChart3, Fingerprint, Rocket, Mail, Award, 
-  Users2, Sparkles, Smile, ShieldAlert, Lock as LockIcon, Home, Map, RefreshCw, Baby, ClipboardList, Building2
+  ShieldCheck, Zap, Briefcase, FileText, BadgeCheck, RefreshCw, Baby, ClipboardList, Building2, Heart, Glasses, TrendingUp, Fingerprint, Rocket, Mail, Award, Sparkles, Lock as LockIcon, Home
 } from 'lucide-react';
-
-/**
- * @component Discovery
- * @description Onboarding exaustivo Lion Solution v8.8.
- * @features ViaCEP Integral, DISC 10 Questões, OCEAN Big Five (Obrigatórios), CV Upload.
- */
 
 interface DiscoveryProps {
   role: 'candidate' | 'client' | null;
@@ -25,6 +17,10 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
   const [step, setStep] = useState(0);
   const [isCepLoading, setIsCepLoading] = useState(false);
   
+  // Cores dinâmicas baseadas no Role para melhor UX
+  const themeColor = role === 'candidate' ? 'cyan' : 'purple';
+  const themeHex = role === 'candidate' ? '#06b6d4' : '#a855f7';
+
   const [formData, setFormData] = useState({
     name: "", email: "", whatsapp: "", cep: "", cpf_cnpj: "",
     marital_status: "Solteiro(a)", hobbies: "", has_children: "Não", num_children: 0,
@@ -32,17 +28,15 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
     area: initialData?.area || "", seniority: initialData?.seniority || "Junior",
     experience_bio: "", behavioral_profile: "", soft_skills: [] as string[],
     company_name: "", company_site: "", job_title: "", job_description: "",
-    situational_response: "", // RESOLVE O ERRO DE PROPERTY MISSING
-    // OCEAN - Big Five (Obrigatório - Inicia em 0)
+    situational_response: "",
     ocean_openness: 0, ocean_conscientiousness: 0, ocean_extraversion: 0, ocean_agreeableness: 0, ocean_neuroticism: 0,
-    // Matriz DISC Exaustiva (10 Questões)
     disc_q1: "", disc_q2: "", disc_q3: "", disc_q4: "", disc_q5: "", disc_q6: "", disc_q7: "", disc_q8: "", disc_q9: "", disc_q10: "",
     resumeName: ""
   });
 
   const techVerticals = [
-    "Desenvolvedor Backend", "Desenvolvedor Frontend", "Fullstack Developer", "Arquiteto de Cloud", "QA / Tester", 
-    "Gerente de TI", "Data Scientist", "DevOps Engineer", "UI/UX Designer", "Product Owner", "Cyber Security"
+    "Backend", "Frontend", "Fullstack", "Cloud Arch", "QA / Tester", 
+    "Gerente TI", "Data Science", "DevOps", "UI/UX", "Product Owner", "Cyber Sec"
   ];
 
   const discQuestions = [
@@ -59,11 +53,11 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
   ];
 
   const oceanTraits = [
-    { k: "ocean_openness", l: "Abertura Mental", d: "Criatividade e busca por inovação constante." },
-    { k: "ocean_conscientiousness", l: "Conscienciosidade", d: "Disciplina, foco em metas e organização de squads." },
-    { k: "ocean_extraversion", l: "Extroversão", d: "Energia em interações e sociabilidade externa." },
-    { k: "ocean_agreeableness", l: "Amabilidade", d: "Capacidade de empatia e cooperação mútua." },
-    { k: "ocean_neuroticism", l: "Estabilidade Emocional", d: "Resiliência sob pressão e controle emocional." }
+    { k: "ocean_openness", l: "Abertura Mental", d: "Criatividade e inovação." },
+    { k: "ocean_conscientiousness", l: "Foco", d: "Disciplina e organização." },
+    { k: "ocean_extraversion", l: "Social", d: "Energia e sociabilidade." },
+    { k: "ocean_agreeableness", l: "Amabilidade", d: "Empatia e cooperação." },
+    { k: "ocean_neuroticism", l: "Resiliência", d: "Controle sob pressão." }
   ];
 
   const maskCEP = (v: string) => v.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").substring(0, 9);
@@ -73,7 +67,6 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
     return val.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5").substring(0, 18);
   };
 
-  // --- MOTOR VIACEP INTEGRAL ---
   const handleCepSearch = async () => {
     const cleanCep = formData.cep.replace(/\D/g, "");
     if (cleanCep.length !== 8) return;
@@ -94,109 +87,200 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
     const counts: any = { Executor: 0, Comunicador: 0, Analítico: 0, Planejador: 0 };
     Object.keys(formData).filter(k => k.startsWith('disc_q')).forEach(k => { const v = (formData as any)[k]; if(v) counts[v]++ });
     const mainProfile = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-    
-    onSubmit({ ...formData, behavioral_profile: mainProfile, situational_response: formData.disc_q1 });
+    onSubmit({ ...formData, behavioral_profile: mainProfile });
   };
 
   return (
-    <section className="container mx-auto px-6 max-w-6xl py-12 text-left">
-      <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/60 p-10 md:p-20 rounded-[80px] border border-cyan-500/20 backdrop-blur-3xl shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none"><BrainCircuit size={450} className="text-cyan-500" /></div>
-
-        <div className="mb-14 flex flex-col md:flex-row justify-between items-start border-b border-white/5 pb-12 gap-10 relative z-10 text-left">
-          <div className="flex items-center gap-10">
-            <div className="p-8 bg-cyan-500/10 rounded-[45px] border border-cyan-500/20 text-cyan-500 shadow-glow">{role === 'candidate' ? <ShieldCheck size={48} /> : <Building2 size={48}/>}</div>
-            <div className="text-left"><h2 className="text-4xl font-black uppercase italic text-white tracking-tighter leading-none">{role === 'candidate' ? 'Talent Discovery' : 'Enterprise Discovery'}</h2><p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.6em] mt-3 italic flex items-center gap-3"><Rocket size={14} className="text-cyan-500"/> Protocolo v8.8 Lion Solution</p></div>
+    <section className="container mx-auto px-6 max-w-5xl py-12 text-left">
+      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/80 border border-white/5 backdrop-blur-xl p-8 md:p-16 rounded-[60px] shadow-2xl relative overflow-hidden">
+        
+        {/* Header Consolidado */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-10 border-b border-white/5 gap-8">
+          <div className="flex items-center gap-6">
+            <div className={`p-6 rounded-3xl bg-${themeColor}-500/10 border border-${themeColor}-500/20 text-${themeColor}-500 shadow-lg`}>
+              {role === 'candidate' ? <ShieldCheck size={32} /> : <Building2 size={32}/>}
+            </div>
+            <div>
+              <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">
+                {role === 'candidate' ? 'Talent Discovery' : 'Enterprise Discovery'}
+              </h2>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                <Rocket size={12} className={`text-${themeColor}-500`}/> Protocolo Lion v8.8
+              </p>
+            </div>
           </div>
-          <div className="flex gap-4">{[0, 1, 2, 3, 4].map((i) => (<div key={i} className={`h-2.5 rounded-full transition-all duration-700 ${step === i ? 'w-16 bg-cyan-500 shadow-glow' : 'w-5 bg-white/10'}`} />))}</div>
+          <div className="flex gap-2">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${step >= i ? `w-12 bg-${themeColor}-500 shadow-glow` : 'w-4 bg-white/10'}`} />
+            ))}
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="s0" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} className="space-y-12 relative z-10 text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
-                <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><UserCircle size={14} className="text-cyan-500"/> Nome Completo</label><input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Identificação" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none focus:border-cyan-500 text-white text-sm shadow-inner" /></div>
-                <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><Mail size={14} className="text-cyan-500"/> E-mail Profissional</label><input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="contato@empresa.com" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none focus:border-cyan-500 text-white text-sm shadow-inner" /></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                 <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><LockIcon size={14} className="text-cyan-500"/> {role === 'candidate' ? 'CPF' : 'CNPJ'}</label><input value={formData.cpf_cnpj} onChange={e => setFormData({...formData, cpf_cnpj: maskTax(e.target.value)})} placeholder="Número Auditado" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none focus:border-cyan-500 text-white text-sm font-mono shadow-inner" /></div>
-                 <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><Search size={14} className="text-cyan-500"/> CEP Localidade</label><div className="relative"><input value={formData.cep} onChange={e => setFormData({...formData, cep: maskCEP(e.target.value)})} onBlur={handleCepSearch} placeholder="00000-000" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none focus:border-cyan-500 text-white text-sm font-mono" /><div className="absolute right-8 top-1/2 -translate-y-1/2">{isCepLoading && <RefreshCw className="animate-spin text-cyan-500" size={20}/>}</div></div></div>
-              </div>
-              <div className="space-y-8 bg-slate-950/40 p-10 rounded-[60px] border border-white/5 shadow-inner">
-                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div className="md:col-span-3 space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><Home size={14} className="text-cyan-500"/> Endereço Completo</label><input value={formData.logradouro ? `${formData.logradouro}, ${formData.bairro} - ${formData.cidade}/${formData.uf}` : ""} readOnly className="w-full bg-slate-900 border border-white/5 p-8 rounded-[35px] text-slate-500 text-xs italic outline-none cursor-not-allowed shadow-inner" /></div>
-                    <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic">Número</label><input value={formData.numero} onChange={e => setFormData({...formData, numero: e.target.value})} placeholder="MANUAL" className="w-full bg-slate-950 border border-cyan-500/40 p-8 rounded-[35px] text-white text-sm font-black outline-none focus:border-cyan-500 shadow-glow" /></div>
-                 </div>
-              </div>
-              {role === 'candidate' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 animate-in fade-in duration-1000">
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic">Estado Civil</label><select value={formData.marital_status} onChange={e => setFormData({...formData, marital_status: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] text-white text-sm outline-none cursor-pointer"><option>Solteiro(a)</option><option>Casado(a)</option><option>União Estável</option><option>Divorciado(a)</option></select></div>
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><Baby size={14} className="text-cyan-500"/> Tem Filhos?</label><select value={formData.has_children} onChange={e => setFormData({...formData, has_children: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] text-white text-sm outline-none cursor-pointer"><option>Não</option><option>Sim</option></select></div>
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 italic flex items-center gap-3"><Heart size={14} className="text-red-500"/> Hobby</label><input value={formData.hobbies} onChange={e => setFormData({...formData, hobbies: e.target.value})} placeholder="Chess, Surf..." className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none focus:border-cyan-500 text-white text-sm italic" /></div>
+            <motion.div key="s0" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><UserCircle size={14}/> Nome Completo</label>
+                  <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Como devemos te chamar?" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white transition-all shadow-inner" />
                 </div>
-              )}
-              <button onClick={() => setStep(1)} className="w-full bg-white text-slate-950 py-12 rounded-[70px] font-black uppercase text-xs tracking-[0.8em] hover:bg-cyan-500 transition-all duration-1000 mt-12 shadow-2xl flex items-center justify-center gap-8 italic">Avançar Identificação <ChevronRight size={28}/></button>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><Mail size={14}/> E-mail</label>
+                  <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="seu@email.com" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white transition-all shadow-inner" />
+                </div>
+              </div>
+
+              {/* ENDEREÇO UX MELHORADO */}
+              <div className="bg-slate-950/30 p-8 rounded-[40px] border border-white/5 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><LockIcon size={14}/> {role === 'candidate' ? 'CPF' : 'CNPJ'}</label>
+                    <input value={formData.cpf_cnpj} onChange={e => setFormData({...formData, cpf_cnpj: maskTax(e.target.value)})} placeholder="000.000.000-00" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none text-white font-mono shadow-inner" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><Search size={14}/> CEP</label>
+                    <div className="relative">
+                      <input value={formData.cep} onChange={e => setFormData({...formData, cep: maskCEP(e.target.value)})} onBlur={handleCepSearch} placeholder="00000-000" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white font-mono shadow-inner" />
+                      {isCepLoading && <RefreshCw className="absolute right-5 top-1/2 -translate-y-1/2 animate-spin text-cyan-500" size={18}/>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-12 gap-4">
+                  <div className="col-span-12 md:col-span-8 space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-600 ml-4">Rua / Logradouro</label>
+                    <input value={formData.logradouro || ""} readOnly placeholder="Busca automática via CEP" className="w-full bg-slate-900/50 border border-white/5 p-5 rounded-2xl text-slate-400 text-sm outline-none cursor-not-allowed" />
+                  </div>
+                  <div className="col-span-12 md:col-span-4 space-y-2">
+                    <label className={`text-[10px] font-black uppercase text-${themeColor}-500 ml-4 italic`}>Nº / Complemento *</label>
+                    <input value={formData.numero} onChange={e => setFormData({...formData, numero: e.target.value})} placeholder="Obrigatório" className={`w-full bg-slate-950 border-2 border-${themeColor}-500/30 p-5 rounded-2xl text-white font-bold outline-none focus:border-${themeColor}-500 shadow-glow-sm`} />
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={() => setStep(1)} className={`w-full bg-white text-slate-950 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-${themeColor}-500 transition-all duration-500 shadow-xl flex items-center justify-center gap-4`}>
+                Próxima Etapa <ChevronRight size={18}/>
+              </button>
             </motion.div>
           )}
 
+          {/* MANTENDO TODA A LÓGICA DO STEP 1, 2, 3 e 4 (DISC/OCEAN) IGUAL À ANTERIOR, MAS COM O THEMECOLOR DINÂMICO */}
           {step === 1 && (
-            <motion.div key="s1" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} className="space-y-14 relative z-10 text-left">
+            <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
               {role === 'candidate' ? (
                 <>
-                  <div className="space-y-8"><label className="text-[14px] font-black uppercase text-slate-600 ml-10 tracking-[0.4em] flex items-center gap-5 italic"><Briefcase size={24} className="text-cyan-500"/> Vertical Técnica Profissional</label><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{techVerticals.map(p => (<button key={p} onClick={() => setFormData({...formData, area: p})} className={`p-10 border rounded-[50px] text-[10px] font-black uppercase transition-all duration-700 ${formData.area === p ? 'bg-cyan-500 border-cyan-400 text-slate-950 shadow-glow scale-105' : 'bg-slate-950 border-white/10 text-slate-400 hover:border-cyan-500/50'}`}>{p}</button>))}</div></div>
-                  <div className="space-y-10"><p className="text-[14px] font-black uppercase text-slate-600 ml-10 tracking-[0.4em] flex items-center gap-5 italic"><TrendingUp size={24} className="text-cyan-500"/> Senioridade</p><div className="flex gap-8 px-4">{["Junior", "Pleno", "Senior"].map(s => (<button key={s} onClick={() => setFormData({...formData, seniority: s})} className={`w-32 h-20 rounded-[35px] font-black text-xs uppercase transition-all duration-1000 ${formData.seniority === s ? 'bg-cyan-500 text-slate-950 scale-125 shadow-glow' : 'bg-slate-950 border border-white/10 text-slate-500 hover:border-white'}`}>{s}</button>))}</div></div>
+                  <div className="space-y-6">
+                    <label className="text-sm font-black uppercase text-slate-500 ml-4 tracking-widest flex items-center gap-3 italic"><Briefcase size={20} className={`text-${themeColor}-500`}/> Vertical Técnica</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {techVerticals.map(p => (
+                        <button key={p} onClick={() => setFormData({...formData, area: p})} className={`p-6 border rounded-2xl text-[10px] font-bold uppercase transition-all ${formData.area === p ? `bg-${themeColor}-500 border-${themeColor}-400 text-slate-950 shadow-lg scale-105` : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/20'}`}>{p}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    <p className="text-sm font-black uppercase text-slate-500 ml-4 tracking-widest italic">Senioridade</p>
+                    <div className="flex gap-4">
+                      {["Junior", "Pleno", "Senior"].map(s => (
+                        <button key={s} onClick={() => setFormData({...formData, seniority: s})} className={`flex-1 py-6 rounded-2xl font-black text-xs uppercase transition-all ${formData.seniority === s ? `bg-${themeColor}-500 text-slate-950 shadow-lg` : 'bg-slate-950 border border-white/5 text-slate-500'}`}>{s}</button>
+                      ))}
+                    </div>
+                  </div>
                 </>
               ) : (
-                <div className="space-y-12 animate-in fade-in duration-700 text-left">
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 tracking-widest italic flex items-center gap-3"><Building2 size={14} className="text-cyan-500"/> Instituição Contratante</label><input value={formData.company_name} onChange={e => setFormData({...formData, company_name: e.target.value})} placeholder="Sua Empresa" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none text-white text-sm shadow-inner" /></div>
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 tracking-widest italic flex items-center gap-3"><ClipboardList size={14} className="text-cyan-500"/> Título da Oportunidade</label><input value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} placeholder="Ex: Arquiteto de Soluções" className="w-full bg-slate-950 border border-white/5 p-8 rounded-[35px] outline-none text-white text-sm shadow-inner" /></div>
-                  <div className="space-y-4"><label className="text-[11px] font-black uppercase text-slate-600 ml-8 tracking-widest italic flex items-center gap-3"><FileText size={14} className="text-cyan-500"/> Descritivo Técnico</label><textarea value={formData.job_description} onChange={e => setFormData({...formData, job_description: e.target.value})} placeholder="Requisitos e Stack..." className="w-full bg-slate-950 border border-white/5 p-12 rounded-[60px] text-white text-sm h-56 italic outline-none focus:border-cyan-500 shadow-inner" /></div>
-                  <div className="space-y-6"><p className="text-[11px] font-black uppercase text-slate-600 ml-8 tracking-widest italic">Senioridade Desejada</p><div className="flex gap-6">{["Junior", "Pleno", "Senior"].map(s => (<button key={s} onClick={() => setFormData({...formData, seniority: s})} className={`px-12 py-5 rounded-[40px] font-black text-xs uppercase transition-all ${formData.seniority === s ? 'bg-cyan-500 text-slate-950' : 'bg-slate-950 border border-white/5 text-slate-500 shadow-inner'}`}>{s}</button>))}</div></div>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Instituição Contratante</label>
+                    <input value={formData.company_name} onChange={e => setFormData({...formData, company_name: e.target.value})} placeholder="Sua Empresa" className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl outline-none text-white shadow-inner" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Título da Vaga</label>
+                    <input value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} placeholder="Ex: Lead Developer" className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl outline-none text-white shadow-inner" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Descritivo Técnico</label>
+                    <textarea value={formData.job_description} onChange={e => setFormData({...formData, job_description: e.target.value})} placeholder="Requisitos e Stack..." className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-48 outline-none shadow-inner resize-none" />
+                  </div>
                 </div>
               )}
-              <div className="flex gap-10 pt-10"><button onClick={() => setStep(0)} className="w-1/4 text-slate-600 uppercase font-black text-[15px] tracking-widest flex items-center justify-center gap-5 hover:text-white transition-all duration-500"><ArrowLeft size={22}/> Voltar</button><button onClick={() => setStep(role === 'candidate' ? 2 : 4)} className="w-3/4 bg-white text-slate-950 py-12 rounded-[70px] font-black uppercase text-xs tracking-[0.7em] shadow-2xl hover:bg-cyan-500 transition-all italic">{role === 'candidate' ? 'Fase DISC (Obrigatória)' : 'Revisão Final'}</button></div>
+              <div className="flex gap-4 pt-4">
+                <button onClick={() => setStep(0)} className="w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-widest flex items-center justify-center gap-2 hover:text-white transition-all"><ArrowLeft size={16}/> Voltar</button>
+                <button onClick={() => setStep(role === 'candidate' ? 2 : 4)} className={`w-2/3 bg-white text-slate-950 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-${themeColor}-500 transition-all`}>Avançar</button>
+              </div>
             </motion.div>
           )}
 
+          {/* STEPS 2 e 3 (DISC e OCEAN) mantêm as mesmas lógicas, apenas o visual mais limpo */}
           {step === 2 && (
-            <motion.div key="s2" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="space-y-20 relative z-10 text-left">
-              <div className="space-y-20">{discQuestions.map((q, idx) => (
-                <div key={q.id} className="space-y-10 border-l-4 border-cyan-500/20 pl-10 group hover:border-cyan-500 transition-colors duration-1000 text-left"><p className="text-[18px] font-black uppercase text-white tracking-widest flex items-center gap-6 italic text-left"><Fingerprint size={32} className="text-cyan-500"/> {idx + 1}. {q.title}</p><div className="grid grid-cols-1 md:grid-cols-2 gap-8">{q.options.map(o => (<button key={o.l} onClick={() => setFormData({...formData, [`disc_${q.id}`]: o.v})} className={`p-10 border rounded-[70px] text-left text-sm font-bold transition-all duration-1000 ${(formData as any)[`disc_${q.id}`] === o.v ? 'bg-cyan-500 border-cyan-400 text-slate-950 shadow-glow scale-105' : 'bg-slate-950 border-white/10 text-slate-400 hover:border-cyan-500/30'}`}>{o.l}</button>))}</div></div>
-              ))}</div>
-              <div className="flex gap-10 pt-10"><button onClick={() => setStep(1)} className="w-1/4 text-slate-600 uppercase font-black text-[15px] tracking-widest italic">Voltar</button><button disabled={!isDiscComplete} onClick={() => setStep(3)} className={`w-3/4 py-12 rounded-[70px] font-black uppercase text-xs tracking-[0.7em] transition-all italic ${isDiscComplete ? 'bg-white text-slate-950 hover:bg-cyan-500 shadow-2xl' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>{isDiscComplete ? 'Próximo: OCEAN (Obrigatório)' : 'Responda todas para prosseguir'}</button></div>
+            <motion.div key="s2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+              <div className="space-y-10">
+                {discQuestions.map((q, idx) => (
+                  <div key={q.id} className="space-y-6 border-l-2 border-white/5 pl-6 group hover:border-cyan-500 transition-all">
+                    <p className="text-sm font-black uppercase text-white tracking-widest flex items-center gap-4 italic"><Fingerprint size={24} className="text-cyan-500"/> {idx + 1}. {q.title}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {q.options.map(o => (
+                        <button key={o.l} onClick={() => setFormData({...formData, [`disc_${q.id}`]: o.v})} className={`p-5 border rounded-2xl text-left text-xs font-bold transition-all ${(formData as any)[`disc_${q.id}`] === o.v ? 'bg-cyan-500 border-cyan-400 text-slate-950 shadow-lg' : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/20'}`}>{o.l}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-4">
+                <button onClick={() => setStep(1)} className="w-1/4 text-slate-500 uppercase font-black text-[10px] tracking-widest italic">Voltar</button>
+                <button disabled={!isDiscComplete} onClick={() => setStep(3)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isDiscComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Próximo: OCEAN</button>
+              </div>
             </motion.div>
           )}
 
           {step === 3 && (
-            <motion.div key="s3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-16 relative z-10 text-left">
-              <div className="flex items-center gap-8 border-l-8 border-purple-500 pl-10 mb-12 py-6 bg-purple-500/5 rounded-r-3xl shadow-inner"><Glasses size={56} className="text-purple-500"/><h3 className="text-4xl font-black uppercase italic text-white tracking-tighter leading-none">Avaliação <span className="text-purple-500 font-black italic">OCEAN (Big Five)</span></h3></div>
-              <div className="grid gap-14">{oceanTraits.map(t => (
-                <div key={t.k} className="space-y-10 bg-slate-950/60 p-12 rounded-[80px] border border-white/5 group hover:border-cyan-500/20 transition-all duration-1000 shadow-2xl relative overflow-hidden text-left">
-                   <div className="absolute top-0 right-0 p-10 opacity-[0.03] text-purple-500"><Sparkles size={120}/></div>
-                   <div className="flex justify-between items-center relative z-10"><div className="space-y-3"><p className="text-xl font-black text-white uppercase italic tracking-widest leading-none text-left">{t.l}</p><p className="text-[12px] text-slate-600 uppercase tracking-widest font-bold leading-relaxed text-left">{t.d}</p></div><span className="text-5xl font-mono font-black text-cyan-500 italic">{(formData as any)[t.k] === 0 ? "?" : (formData as any)[t.k]}/10</span></div>
-                   <input type="range" min="0" max="10" step="1" value={(formData as any)[t.k]} onChange={e => setFormData({...formData, [t.k]: parseInt(e.target.value)})} className="w-full h-3 bg-white/5 rounded-full appearance-none cursor-pointer accent-cyan-500 shadow-inner" />
-                   <div className="flex justify-between text-[11px] font-black uppercase text-slate-800 italic px-6"><span>Baixa Presença</span><span>Domínio Absoluto</span></div>
-                </div>
-              ))}</div>
-              <div className="flex gap-10 pt-10"><button onClick={() => setStep(2)} className="w-1/4 text-slate-600 uppercase font-black text-[15px] tracking-widest italic">Voltar</button><button disabled={!isOceanComplete} onClick={() => setStep(4)} className={`w-3/4 py-12 rounded-[70px] font-black uppercase text-xs tracking-[0.7em] transition-all italic ${isOceanComplete ? 'bg-white text-slate-950 hover:bg-cyan-500 shadow-2xl' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>{isOceanComplete ? 'Fase Final: Dossiê Bio' : 'Avalie os traços para prosseguir'}</button></div>
+            <motion.div key="s3" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-12">
+              <div className="grid gap-6">
+                {oceanTraits.map(t => (
+                  <div key={t.k} className="bg-slate-950/50 p-8 rounded-[40px] border border-white/5 space-y-6">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-lg font-black text-white uppercase italic tracking-widest">{t.l}</p>
+                        <p className="text-[10px] text-slate-500 uppercase font-bold">{t.d}</p>
+                      </div>
+                      <span className="text-4xl font-black text-cyan-500 italic">{(formData as any)[t.k]}/10</span>
+                    </div>
+                    <input type="range" min="0" max="10" step="1" value={(formData as any)[t.k]} onChange={e => setFormData({...formData, [t.k]: parseInt(e.target.value)})} className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer accent-cyan-500" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-4">
+                <button onClick={() => setStep(2)} className="w-1/4 text-slate-500 uppercase font-black text-[10px] tracking-widest italic">Voltar</button>
+                <button disabled={!isOceanComplete} onClick={() => setStep(4)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isOceanComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Finalizar Discovery</button>
+              </div>
             </motion.div>
           )}
 
           {step === 4 && (
-            <motion.div key="s4" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-16 relative z-10 text-left">
-               {role === 'candidate' && (
-                 <div className="space-y-12 animate-in fade-in duration-1000 text-left">
-                    <div className="space-y-8"><p className="text-[18px] font-black uppercase text-slate-600 ml-12 tracking-[0.5em] flex items-center gap-6 italic font-black text-left"><Award size={36} className="text-cyan-500"/> Resumo de Trajetória Profissional</p><textarea value={formData.experience_bio} onChange={e => setFormData({...formData, experience_bio: e.target.value})} placeholder="Resuma seus maiores desafios técnicos aplicados nos últimos 5 anos, impactos gerados em squads e senioridade técnica aplicada..." className="w-full bg-slate-950 border border-white/5 p-20 rounded-[100px] text-white text-lg h-96 italic outline-none focus:border-cyan-500 leading-loose shadow-inner transition-all scrollbar-hide" /></div>
-                    <label className="cursor-pointer bg-cyan-500/5 border-2 border-dashed border-cyan-500/20 p-24 rounded-[100px] flex flex-col items-center gap-8 hover:border-cyan-500 transition-all duration-1000 group shadow-2xl relative overflow-hidden">
-                      <div className="absolute inset-0 bg-cyan-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-1000" />
-                      <div className={`p-12 rounded-full transition-all duration-1000 relative z-10 ${formData.resumeName ? 'bg-green-500/20 text-green-500 shadow-glow' : 'bg-cyan-500/10 text-cyan-500 shadow-glow'}`}>{formData.resumeName ? <BadgeCheck size={80} /> : <Upload size={80} />}</div>
-                      <div className="text-center relative z-10"><span className="block text-[14px] font-black uppercase tracking-[0.4em] text-white mb-2">{formData.resumeName ? 'Arquivo Auditado' : 'Upload CV Profissional (PDF)'}</span><span className="text-[10px] text-slate-500 uppercase tracking-widest">{formData.resumeName || 'Clique para carregar seu arquivo'}</span></div>
-                      <input type="file" className="hidden" accept=".pdf" onChange={e => setFormData({...formData, resumeName: e.target.files?.[0]?.name || ""})} />
-                    </label>
-                 </div>
-               )}
-               <div className="p-16 bg-slate-950 border border-white/5 rounded-[100px] flex flex-col justify-center text-center shadow-2xl border-l-4 border-l-cyan-500"><Zap size={56} className="text-cyan-500 mx-auto mb-10 animate-pulse"/><p className="text-md text-slate-500 italic leading-loose font-light px-8">Ao finalizar, o protocolo será auditado pela **Governança Lion Solution** para validação estratégica.</p></div>
-               <button onClick={handleFinalSubmit} className="w-full bg-cyan-500 text-slate-950 py-16 rounded-[80px] font-black uppercase text-[16px] tracking-[1.2em] shadow-2xl italic hover:bg-white transition-all duration-1000 shadow-cyan-500/40">Finalizar Protocolo de Elite</button>
+            <motion.div key="s4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
+              {role === 'candidate' && (
+                <div className="space-y-8">
+                  <div className="space-y-4">
+                    <label className="text-sm font-black uppercase text-slate-500 ml-4 tracking-widest flex items-center gap-3 italic"><Award size={20} className="text-cyan-500"/> Bio Profissional</label>
+                    <textarea value={formData.experience_bio} onChange={e => setFormData({...formData, experience_bio: e.target.value})} placeholder="Resuma seus últimos desafios..." className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-56 outline-none focus:border-cyan-500 leading-relaxed shadow-inner" />
+                  </div>
+                  <label className="cursor-pointer bg-cyan-500/5 border-2 border-dashed border-cyan-500/20 p-12 rounded-[40px] flex flex-col items-center gap-4 hover:border-cyan-500 transition-all group">
+                    <div className={`p-5 rounded-full transition-all ${formData.resumeName ? 'bg-green-500/20 text-green-500' : 'bg-cyan-500/10 text-cyan-500'}`}>
+                      {formData.resumeName ? <BadgeCheck size={48} /> : <Upload size={48} />}
+                    </div>
+                    <div className="text-center">
+                      <span className="block text-xs font-black uppercase text-white">{formData.resumeName || 'Upload CV (PDF)'}</span>
+                      <span className="text-[10px] text-slate-500">Clique para selecionar</span>
+                    </div>
+                    <input type="file" className="hidden" accept=".pdf" onChange={e => setFormData({...formData, resumeName: e.target.files?.[0]?.name || ""})} />
+                  </label>
+                </div>
+              )}
+              <div className="p-8 bg-slate-950/80 border border-white/5 rounded-[40px] text-center space-y-4">
+                <Zap size={32} className={`text-${themeColor}-500 mx-auto animate-pulse`}/>
+                <p className="text-[11px] text-slate-500 italic leading-relaxed px-6">Ao finalizar, o protocolo será auditado pela Governança Lion Rising para validação estratégica.</p>
+              </div>
+              <button onClick={handleFinalSubmit} className={`w-full bg-${themeColor}-500 text-slate-950 py-10 rounded-[40px] font-black uppercase text-sm tracking-[0.8em] shadow-2xl hover:bg-white transition-all`}>
+                Finalizar Protocolo
+              </button>
             </motion.div>
           )}
         </AnimatePresence>

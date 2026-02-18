@@ -37,7 +37,7 @@ export default function Dashboard({ ticket }: { ticket: TicketData }) {
               <div className="flex flex-wrap gap-4 items-center"><span className="text-cyan-500 text-[12px] font-black uppercase tracking-[0.6em] italic">Protocolo: {ticket.id}</span><span className="text-slate-500 text-[12px] font-black uppercase tracking-[0.4em] italic">• Lion Rising Digital Unit</span></div>
             </div>
           </div>
-          <div className="bg-slate-950 px-10 py-6 rounded-[35px] border border-white/5 shadow-inner group"><p className="text-[10px] uppercase text-slate-600 font-black tracking-widest mb-3 italic flex items-center gap-2"><Activity size={12} className="text-cyan-500"/> Status:</p><p className="text-cyan-500 font-black uppercase italic text-2xl tracking-tighter flex items-center gap-3">{ticket.status} <ArrowUpRight size={20} className="opacity-30 group-hover:opacity-100 transition-all" /></p></div>
+          <div className="bg-slate-950 px-10 py-6 rounded-[35px] border border-white/5 shadow-inner group"><p className="text-[10px] uppercase text-slate-600 font-black tracking-widest mb-3 italic flex items-center gap-2"><Activity size={12} className="text-cyan-500"/> Status Operacional:</p><p className="text-cyan-500 font-black uppercase italic text-2xl tracking-tighter flex items-center gap-3">{ticket.status} <ArrowUpRight size={20} className="opacity-30 group-hover:opacity-100 transition-all" /></p></div>
         </div>
 
         {/* --- TIMELINE --- */}

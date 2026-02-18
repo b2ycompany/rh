@@ -15,16 +15,18 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-/**
- * @interface TicketData
- * @description Contrato de dados integral para o ecossistema de governança Lion Solution.
- */
+// --- INTERFACES TÉCNICAS INTEGRAIS (SINCRO TOTAL BACKOFFICE) ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
 
 export interface JobData {
-  id: string; title: string; area: string; seniority: string;
-  description: string; salary: string; status: 'Ativa' | 'Pausada';
+  id: string;
+  title: string;
+  area: string;
+  seniority: string;
+  description: string;
+  salary: string;
+  status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
@@ -51,10 +53,10 @@ export interface TicketData {
   status: string;
   date: string;
   resume_url?: string;
-  // --- INTELIGÊNCIA PSICOMÉTRICA DE ELITE ---
+  // --- INTELIGÊNCIA PSICOMÉTRICA DE ELITE (DISC + OCEAN) ---
   experience_bio?: string;
   soft_skills?: string;
-  behavioral_profile?: string; // DISC Principal
+  behavioral_profile?: string; // DISC Principal Resultante
   disc_q1?: string; disc_q2?: string; disc_q3?: string; disc_q4?: string;
   marital_status?: string; 
   hobbies?: string;         
@@ -80,7 +82,7 @@ export interface TicketData {
   contract_end?: string;       
   monthly_value?: number;      
   first_salary?: number;       
-  hiring_fee?: number;         
+  hiring_fee?: number;         // Receita única Lion (50/65/75%)
   hiring_notes?: string;       
   billing_day?: number;        
   payment_status?: string;
@@ -95,6 +97,7 @@ export default function TammyPlatform() {
   const [allTickets, setAllTickets] = useState<TicketData[]>([]);
   const [vacancies, setVacancies] = useState<JobData[]>([]);
 
+  // Sincronização em tempo real com auditoria de integridade Belém/PA
   const fetchData = async () => {
     try {
       const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
@@ -102,7 +105,7 @@ export default function TammyPlatform() {
       if (jobs) setVacancies(jobs);
       if (tix) setAllTickets(tix);
     } catch (err) {
-      console.error("ERRO CRÍTICO NA SINCRONIZAÇÃO:", err);
+      console.error("ERRO CRÍTICO NA BUSCA DE DADOS:", err);
     } finally {
       setTimeout(() => setIsLoading(false), 3000);
     }
@@ -117,7 +120,7 @@ export default function TammyPlatform() {
       setView('home'); 
       window.scrollTo({ top: 0, behavior: 'smooth' }); 
     } else { 
-      alert("Protocolo não localizado na governança."); 
+      alert("Protocolo não localizado na governança Lion."); 
     }
   };
 
@@ -140,12 +143,13 @@ export default function TammyPlatform() {
       setAllTickets(prev => [dbPayload as any, ...prev]);
       setView('home');
     } else {
-      console.error("ERRO SUPABASE:", error);
+      console.error("ERRO SUPABASE DETALHADO:", error);
       alert(`Falha no banco: ${error.message}`);
     }
   };
 
   const updateTicketERP = async (id: string, updatedData: any) => {
+    console.log(`AUDITORIA FINANCEIRA: Atualizando Ticket ${id}`, updatedData);
     const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
     if (!error) {
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));

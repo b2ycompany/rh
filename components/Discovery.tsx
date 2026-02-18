@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  BrainCircuit, Upload, CheckCircle2, ChevronRight, Search, ArrowLeft, UserCircle, Star, Target, MapPin, 
-  ShieldCheck, Zap, Briefcase, FileText, BadgeCheck, RefreshCw, Baby, ClipboardList, Building2, Heart, Glasses, TrendingUp, Fingerprint, Rocket, Mail, Award, Sparkles, Lock as LockIcon, Home
+  BrainCircuit, Upload, ChevronRight, Search, ArrowLeft, UserCircle, ShieldCheck, Zap, 
+  Briefcase, FileText, BadgeCheck, RefreshCw, Baby, Building2, Heart, Glasses, 
+  Fingerprint, Rocket, Mail, Award, Sparkles, Lock as LockIcon, Home, Users2, TrendingUp
 } from 'lucide-react';
 
 interface DiscoveryProps {
@@ -16,28 +17,25 @@ interface DiscoveryProps {
 export default function Discovery({ role, initialData, onSubmit }: DiscoveryProps) {
   const [step, setStep] = useState(0);
   const [isCepLoading, setIsCepLoading] = useState(false);
-  
-  // Cores dinâmicas baseadas no Role para melhor UX
   const themeColor = role === 'candidate' ? 'cyan' : 'purple';
-  const themeHex = role === 'candidate' ? '#06b6d4' : '#a855f7';
 
   const [formData, setFormData] = useState({
     name: "", email: "", whatsapp: "", cep: "", cpf_cnpj: "",
-    marital_status: "Solteiro(a)", hobbies: "", has_children: "Não", num_children: 0,
+    // Dossiê RH (Melhores Práticas)
+    marital_status: "Solteiro(a)", has_children: "Não", num_children: 0, hobbies: "",
+    // Endereço (Agora totalmente editável)
     logradouro: "", bairro: "", cidade: "", uf: "", numero: "",
+    // Profissional
     area: initialData?.area || "", seniority: initialData?.seniority || "Junior",
-    experience_bio: "", behavioral_profile: "", soft_skills: [] as string[],
-    company_name: "", company_site: "", job_title: "", job_description: "",
-    situational_response: "",
+    experience_bio: "", company_name: "", job_title: "", job_description: "",
+    // OCEAN
     ocean_openness: 0, ocean_conscientiousness: 0, ocean_extraversion: 0, ocean_agreeableness: 0, ocean_neuroticism: 0,
+    // DISC (As 10 questões originais mantidas)
     disc_q1: "", disc_q2: "", disc_q3: "", disc_q4: "", disc_q5: "", disc_q6: "", disc_q7: "", disc_q8: "", disc_q9: "", disc_q10: "",
     resumeName: ""
   });
 
-  const techVerticals = [
-    "Backend", "Frontend", "Fullstack", "Cloud Arch", "QA / Tester", 
-    "Gerente TI", "Data Science", "DevOps", "UI/UX", "Product Owner", "Cyber Sec"
-  ];
+  const techVerticals = ["Backend", "Frontend", "Fullstack", "Cloud Arch", "QA / Tester", "Gerente TI", "Data Science", "DevOps", "UI/UX", "Product Owner", "Cyber Sec"];
 
   const discQuestions = [
     { id: "q1", title: "Como você reage a metas agressivas e prazos curtos?", options: [{l: "Foco total no resultado técnico", v: "Executor"}, {l: "Envolvo o time para atingirmos juntos", v: "Comunicador"}, {l: "Analiso detalhadamente os riscos", v: "Analítico"}, {l: "Mantenho o plano estável e seguro", v: "Planejador"}] },
@@ -53,19 +51,12 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
   ];
 
   const oceanTraits = [
-    { k: "ocean_openness", l: "Abertura Mental", d: "Criatividade e inovação." },
-    { k: "ocean_conscientiousness", l: "Foco", d: "Disciplina e organização." },
-    { k: "ocean_extraversion", l: "Social", d: "Energia e sociabilidade." },
-    { k: "ocean_agreeableness", l: "Amabilidade", d: "Empatia e cooperação." },
-    { k: "ocean_neuroticism", l: "Resiliência", d: "Controle sob pressão." }
+    { k: "ocean_openness", l: "Abertura Mental", d: "Criatividade e inovação constante." },
+    { k: "ocean_conscientiousness", l: "Conscienciosidade", d: "Disciplina e foco em metas." },
+    { k: "ocean_extraversion", l: "Extroversão", d: "Energia em interações sociais." },
+    { k: "ocean_agreeableness", l: "Amabilidade", d: "Capacidade de empatia e cooperação." },
+    { k: "ocean_neuroticism", l: "Resiliência", d: "Estabilidade emocional sob pressão." }
   ];
-
-  const maskCEP = (v: string) => v.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").substring(0, 9);
-  const maskTax = (v: string) => {
-    const val = v.replace(/\D/g, "");
-    if (val.length <= 11) return val.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4").substring(0, 14);
-    return val.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5").substring(0, 18);
-  };
 
   const handleCepSearch = async () => {
     const cleanCep = formData.cep.replace(/\D/g, "");
@@ -94,19 +85,15 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
     <section className="container mx-auto px-6 max-w-5xl py-12 text-left">
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/80 border border-white/5 backdrop-blur-xl p-8 md:p-16 rounded-[60px] shadow-2xl relative overflow-hidden">
         
-        {/* Header Consolidado */}
+        {/* PROGRESSO */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-10 border-b border-white/5 gap-8">
           <div className="flex items-center gap-6">
-            <div className={`p-6 rounded-3xl bg-${themeColor}-500/10 border border-${themeColor}-500/20 text-${themeColor}-500 shadow-lg`}>
+            <div className={`p-6 rounded-3xl bg-${themeColor}-500/10 border border-${themeColor}-500/20 text-${themeColor}-500 shadow-lg shadow-${themeColor}-500/10`}>
               {role === 'candidate' ? <ShieldCheck size={32} /> : <Building2 size={32}/>}
             </div>
             <div>
-              <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">
-                {role === 'candidate' ? 'Talent Discovery' : 'Enterprise Discovery'}
-              </h2>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
-                <Rocket size={12} className={`text-${themeColor}-500`}/> Protocolo Lion v8.8
-              </p>
+              <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">Discovery {role === 'candidate' ? 'Talento' : 'Empresa'}</h2>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2"><Rocket size={12}/> Protocolo Lion Rising v8.8</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -118,62 +105,91 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
 
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="s0" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-8">
+            <motion.div key="s0" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><UserCircle size={14}/> Nome Completo</label>
-                  <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Como devemos te chamar?" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white transition-all shadow-inner" />
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Nome Completo</label>
+                  <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-cyan-500" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><Mail size={14}/> E-mail</label>
-                  <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="seu@email.com" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white transition-all shadow-inner" />
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-4">E-mail Profissional</label>
+                  <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl text-white outline-none focus:border-cyan-500" />
                 </div>
               </div>
 
-              {/* ENDEREÇO UX MELHORADO */}
-              <div className="bg-slate-950/30 p-8 rounded-[40px] border border-white/5 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><LockIcon size={14}/> {role === 'candidate' ? 'CPF' : 'CNPJ'}</label>
-                    <input value={formData.cpf_cnpj} onChange={e => setFormData({...formData, cpf_cnpj: maskTax(e.target.value)})} placeholder="000.000.000-00" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none text-white font-mono shadow-inner" />
-                  </div>
+              {/* ENDEREÇO UNIFICADO EDITÁVEL */}
+              <div className="bg-slate-950/40 p-8 rounded-[40px] border border-white/5 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><Search size={14}/> CEP</label>
                     <div className="relative">
-                      <input value={formData.cep} onChange={e => setFormData({...formData, cep: maskCEP(e.target.value)})} onBlur={handleCepSearch} placeholder="00000-000" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl outline-none focus:border-cyan-500 text-white font-mono shadow-inner" />
-                      {isCepLoading && <RefreshCw className="absolute right-5 top-1/2 -translate-y-1/2 animate-spin text-cyan-500" size={18}/>}
+                      <input value={formData.cep} onChange={e => setFormData({...formData, cep: e.target.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").substring(0, 9)})} onBlur={handleCepSearch} placeholder="00000-000" className="w-full bg-slate-950/50 border border-white/10 p-5 rounded-2xl text-white outline-none font-mono" />
+                      {isCepLoading && <RefreshCw className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-cyan-500" size={18}/>}
                     </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-12 md:col-span-8 space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-600 ml-4">Rua / Logradouro</label>
-                    <input value={formData.logradouro || ""} readOnly placeholder="Busca automática via CEP" className="w-full bg-slate-900/50 border border-white/5 p-5 rounded-2xl text-slate-400 text-sm outline-none cursor-not-allowed" />
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Logradouro (Rua/Avenida)</label>
+                    <input value={formData.logradouro} onChange={e => setFormData({...formData, logradouro: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none" />
                   </div>
-                  <div className="col-span-12 md:col-span-4 space-y-2">
-                    <label className={`text-[10px] font-black uppercase text-${themeColor}-500 ml-4 italic`}>Nº / Complemento *</label>
-                    <input value={formData.numero} onChange={e => setFormData({...formData, numero: e.target.value})} placeholder="Obrigatório" className={`w-full bg-slate-950 border-2 border-${themeColor}-500/30 p-5 rounded-2xl text-white font-bold outline-none focus:border-${themeColor}-500 shadow-glow-sm`} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-cyan-500 ml-4 italic">Número</label>
+                    <input value={formData.numero} onChange={e => setFormData({...formData, numero: e.target.value})} placeholder="Ex: 123" className="w-full bg-slate-950 border-2 border-cyan-500/20 p-5 rounded-2xl text-white font-bold outline-none focus:border-cyan-500" />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Cidade</label>
+                    <input value={formData.cidade} onChange={e => setFormData({...formData, cidade: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4">UF</label>
+                    <input value={formData.uf} onChange={e => setFormData({...formData, uf: e.target.value})} maxLength={2} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white text-center outline-none" />
                   </div>
                 </div>
               </div>
 
-              <button onClick={() => setStep(1)} className={`w-full bg-white text-slate-950 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-${themeColor}-500 transition-all duration-500 shadow-xl flex items-center justify-center gap-4`}>
-                Próxima Etapa <ChevronRight size={18}/>
-              </button>
+              {/* DOSSIÊ PESSOAL */}
+              {role === 'candidate' && (
+                <div className="bg-slate-950/20 p-8 rounded-[40px] border border-white/5 space-y-6 animate-in fade-in duration-700">
+                   <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-3"><Users2 size={16} className="text-cyan-500"/> Composição Familiar e Perfil</p>
+                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Estado Civil</label>
+                        <select value={formData.marital_status} onChange={e => setFormData({...formData, marital_status: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none">
+                          <option>Solteiro(a)</option><option>Casado(a)</option><option>União Estável</option><option>Divorciado(a)</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Tem Filhos?</label>
+                        <select value={formData.has_children} onChange={e => setFormData({...formData, has_children: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none">
+                          <option>Não</option><option>Sim</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-4">Quantos?</label>
+                        <input type="number" disabled={formData.has_children === "Não"} value={formData.num_children} onChange={e => setFormData({...formData, num_children: parseInt(e.target.value)})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none disabled:opacity-30" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-4 flex items-center gap-2"><Heart size={14} className="text-red-500"/> Hobby</label>
+                        <input value={formData.hobbies} onChange={e => setFormData({...formData, hobbies: e.target.value})} placeholder="Ex: Surf, Música..." className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none italic" />
+                      </div>
+                   </div>
+                </div>
+              )}
+
+              <button onClick={() => setStep(1)} className={`w-full bg-white text-slate-950 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-${themeColor}-500 transition-all shadow-xl flex items-center justify-center gap-4`}>Avançar Discovery <ChevronRight size={18}/></button>
             </motion.div>
           )}
 
-          {/* MANTENDO TODA A LÓGICA DO STEP 1, 2, 3 e 4 (DISC/OCEAN) IGUAL À ANTERIOR, MAS COM O THEMECOLOR DINÂMICO */}
           {step === 1 && (
-            <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
+            <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
               {role === 'candidate' ? (
                 <>
                   <div className="space-y-6">
                     <label className="text-sm font-black uppercase text-slate-500 ml-4 tracking-widest flex items-center gap-3 italic"><Briefcase size={20} className={`text-${themeColor}-500`}/> Vertical Técnica</label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {techVerticals.map(p => (
-                        <button key={p} onClick={() => setFormData({...formData, area: p})} className={`p-6 border rounded-2xl text-[10px] font-bold uppercase transition-all ${formData.area === p ? `bg-${themeColor}-500 border-${themeColor}-400 text-slate-950 shadow-lg scale-105` : 'bg-slate-950 border-white/5 text-slate-500 hover:border-white/20'}`}>{p}</button>
+                        <button key={p} onClick={() => setFormData({...formData, area: p})} className={`p-6 border rounded-2xl text-[10px] font-bold uppercase transition-all ${formData.area === p ? `bg-${themeColor}-500 border-${themeColor}-400 text-slate-950 shadow-lg` : 'bg-slate-950 border-white/5 text-slate-500'}`}>{p}</button>
                       ))}
                     </div>
                   </div>
@@ -187,34 +203,24 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
                   </div>
                 </>
               ) : (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Instituição Contratante</label>
-                    <input value={formData.company_name} onChange={e => setFormData({...formData, company_name: e.target.value})} placeholder="Sua Empresa" className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl outline-none text-white shadow-inner" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Título da Vaga</label>
-                    <input value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} placeholder="Ex: Lead Developer" className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl outline-none text-white shadow-inner" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-4 tracking-widest">Descritivo Técnico</label>
-                    <textarea value={formData.job_description} onChange={e => setFormData({...formData, job_description: e.target.value})} placeholder="Requisitos e Stack..." className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-48 outline-none shadow-inner resize-none" />
-                  </div>
+                <div className="space-y-6 text-left">
+                  <div className="space-y-2"><label className="text-[10px] font-black uppercase text-slate-500 ml-4">Empresa</label><input value={formData.company_name} onChange={e => setFormData({...formData, company_name: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none" /></div>
+                  <div className="space-y-2"><label className="text-[10px] font-black uppercase text-slate-500 ml-4">Título da Vaga</label><input value={formData.job_title} onChange={e => setFormData({...formData, job_title: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-5 rounded-2xl text-white outline-none" /></div>
+                  <div className="space-y-2"><label className="text-[10px] font-black uppercase text-slate-500 ml-4">Descritivo</label><textarea value={formData.job_description} onChange={e => setFormData({...formData, job_description: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-48 outline-none" /></div>
                 </div>
               )}
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-4">
                 <button onClick={() => setStep(0)} className="w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-widest flex items-center justify-center gap-2 hover:text-white transition-all"><ArrowLeft size={16}/> Voltar</button>
                 <button onClick={() => setStep(role === 'candidate' ? 2 : 4)} className={`w-2/3 bg-white text-slate-950 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] hover:bg-${themeColor}-500 transition-all`}>Avançar</button>
               </div>
             </motion.div>
           )}
 
-          {/* STEPS 2 e 3 (DISC e OCEAN) mantêm as mesmas lógicas, apenas o visual mais limpo */}
           {step === 2 && (
             <motion.div key="s2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
               <div className="space-y-10">
                 {discQuestions.map((q, idx) => (
-                  <div key={q.id} className="space-y-6 border-l-2 border-white/5 pl-6 group hover:border-cyan-500 transition-all">
+                  <div key={q.id} className="space-y-6 border-l-2 border-white/5 pl-6 group hover:border-cyan-500 transition-all text-left">
                     <p className="text-sm font-black uppercase text-white tracking-widest flex items-center gap-4 italic"><Fingerprint size={24} className="text-cyan-500"/> {idx + 1}. {q.title}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {q.options.map(o => (
@@ -226,7 +232,7 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
               </div>
               <div className="flex gap-4">
                 <button onClick={() => setStep(1)} className="w-1/4 text-slate-500 uppercase font-black text-[10px] tracking-widest italic">Voltar</button>
-                <button disabled={!isDiscComplete} onClick={() => setStep(3)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isDiscComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Próximo: OCEAN</button>
+                <button disabled={!isDiscComplete} onClick={() => setStep(3)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isDiscComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Avaliação OCEAN</button>
               </div>
             </motion.div>
           )}
@@ -235,12 +241,9 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
             <motion.div key="s3" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-12">
               <div className="grid gap-6">
                 {oceanTraits.map(t => (
-                  <div key={t.k} className="bg-slate-950/50 p-8 rounded-[40px] border border-white/5 space-y-6">
+                  <div key={t.k} className="bg-slate-950/50 p-8 rounded-[40px] border border-white/5 space-y-6 text-left">
                     <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-lg font-black text-white uppercase italic tracking-widest">{t.l}</p>
-                        <p className="text-[10px] text-slate-500 uppercase font-bold">{t.d}</p>
-                      </div>
+                      <div><p className="text-lg font-black text-white uppercase italic tracking-widest">{t.l}</p><p className="text-[10px] text-slate-500 uppercase font-bold">{t.d}</p></div>
                       <span className="text-4xl font-black text-cyan-500 italic">{(formData as any)[t.k]}/10</span>
                     </div>
                     <input type="range" min="0" max="10" step="1" value={(formData as any)[t.k]} onChange={e => setFormData({...formData, [t.k]: parseInt(e.target.value)})} className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer accent-cyan-500" />
@@ -249,7 +252,7 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
               </div>
               <div className="flex gap-4">
                 <button onClick={() => setStep(2)} className="w-1/4 text-slate-500 uppercase font-black text-[10px] tracking-widest italic">Voltar</button>
-                <button disabled={!isOceanComplete} onClick={() => setStep(4)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isOceanComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Finalizar Discovery</button>
+                <button disabled={!isOceanComplete} onClick={() => setStep(4)} className={`w-3/4 py-8 rounded-[40px] font-black uppercase text-[11px] tracking-[0.4em] transition-all ${isOceanComplete ? 'bg-white text-slate-950 hover:bg-cyan-500' : 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'}`}>Fase Final</button>
               </div>
             </motion.div>
           )}
@@ -257,18 +260,18 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
           {step === 4 && (
             <motion.div key="s4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
               {role === 'candidate' && (
-                <div className="space-y-8">
+                <div className="space-y-8 text-left">
                   <div className="space-y-4">
-                    <label className="text-sm font-black uppercase text-slate-500 ml-4 tracking-widest flex items-center gap-3 italic"><Award size={20} className="text-cyan-500"/> Bio Profissional</label>
-                    <textarea value={formData.experience_bio} onChange={e => setFormData({...formData, experience_bio: e.target.value})} placeholder="Resuma seus últimos desafios..." className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-56 outline-none focus:border-cyan-500 leading-relaxed shadow-inner" />
+                    <label className="text-sm font-black uppercase text-slate-500 ml-4 flex items-center gap-3 italic"><Award size={20} className="text-cyan-500"/> Bio Profissional de Elite</label>
+                    <textarea value={formData.experience_bio} onChange={e => setFormData({...formData, experience_bio: e.target.value})} placeholder="Resuma seus maiores desafios técnicos aplicados nos últimos 5 anos..." className="w-full bg-slate-950 border border-white/10 p-8 rounded-[40px] text-white text-sm h-56 outline-none focus:border-cyan-500 leading-relaxed shadow-inner" />
                   </div>
                   <label className="cursor-pointer bg-cyan-500/5 border-2 border-dashed border-cyan-500/20 p-12 rounded-[40px] flex flex-col items-center gap-4 hover:border-cyan-500 transition-all group">
-                    <div className={`p-5 rounded-full transition-all ${formData.resumeName ? 'bg-green-500/20 text-green-500' : 'bg-cyan-500/10 text-cyan-500'}`}>
+                    <div className={`p-5 rounded-full transition-all ${formData.resumeName ? 'bg-green-500/20 text-green-500 shadow-glow' : 'bg-cyan-500/10 text-cyan-500'}`}>
                       {formData.resumeName ? <BadgeCheck size={48} /> : <Upload size={48} />}
                     </div>
                     <div className="text-center">
-                      <span className="block text-xs font-black uppercase text-white">{formData.resumeName || 'Upload CV (PDF)'}</span>
-                      <span className="text-[10px] text-slate-500">Clique para selecionar</span>
+                      <span className="block text-xs font-black uppercase text-white">{formData.resumeName || 'Upload CV Profissional (PDF)'}</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-widest">{formData.resumeName ? 'Arquivo Auditado' : 'Clique para selecionar'}</span>
                     </div>
                     <input type="file" className="hidden" accept=".pdf" onChange={e => setFormData({...formData, resumeName: e.target.files?.[0]?.name || ""})} />
                   </label>
@@ -276,11 +279,9 @@ export default function Discovery({ role, initialData, onSubmit }: DiscoveryProp
               )}
               <div className="p-8 bg-slate-950/80 border border-white/5 rounded-[40px] text-center space-y-4">
                 <Zap size={32} className={`text-${themeColor}-500 mx-auto animate-pulse`}/>
-                <p className="text-[11px] text-slate-500 italic leading-relaxed px-6">Ao finalizar, o protocolo será auditado pela Governança Lion Rising para validação estratégica.</p>
+                <p className="text-[11px] text-slate-500 italic leading-relaxed px-6 italic">Ao finalizar, o protocolo será auditado pela Governança Lion Rising para validação estratégica.</p>
               </div>
-              <button onClick={handleFinalSubmit} className={`w-full bg-${themeColor}-500 text-slate-950 py-10 rounded-[40px] font-black uppercase text-sm tracking-[0.8em] shadow-2xl hover:bg-white transition-all`}>
-                Finalizar Protocolo
-              </button>
+              <button onClick={handleFinalSubmit} className={`w-full bg-${themeColor}-500 text-slate-950 py-10 rounded-[40px] font-black uppercase text-sm tracking-[0.8em] shadow-2xl hover:bg-white transition-all`}>Finalizar Protocolo</button>
             </motion.div>
           )}
         </AnimatePresence>

@@ -15,21 +15,13 @@ import Dashboard from '@/components/Dashboard';
 import AdminRH from '@/components/AdminRH';
 import JobBoard from '@/components/JobBoard';
 
-/**
- * @interface TicketData
- * @description Contrato de dados integral para governança Lion Solution.
- */
+// --- INTERFACES TÉCNICAS INTEGRAIS (SINCRO TOTAL FINANCEIRO) ---
 export type UserRole = 'candidate' | 'client' | null;
 export type ViewState = 'home' | 'discovery' | 'admin' | 'tracking';
 
 export interface JobData {
-  id: string;
-  title: string;
-  area: string;
-  seniority: string;
-  description: string;
-  salary: string;
-  status: 'Ativa' | 'Pausada';
+  id: string; title: string; area: string; seniority: string;
+  description: string; salary: string; status: 'Ativa' | 'Pausada';
 }
 
 export interface TicketData {
@@ -67,24 +59,25 @@ export interface TicketData {
   situational_response?: string;
   marital_status?: string;
   hobbies?: string;
-  // Métricas OCEAN
+  // Métricas Big Five (OCEAN)
   ocean_openness?: number;
   ocean_conscientiousness?: number;
   ocean_extraversion?: number;
   ocean_agreeableness?: number;
   ocean_neuroticism?: number;
-  // --- GESTÃO BACKOFFICE & ERP (ELIMINA ERROS DE COMPILAÇÃO) ---
+  // --- GESTÃO BACKOFFICE, ERP & BALANÇO FINANCEIRO ---
   contract_url?: string;
   id_docs_url?: string;
-  contract_status?: string;
-  employment_status?: string;
-  client_assigned?: string;
-  project_name?: string;
-  contract_start?: string;
-  contract_end?: string;
-  first_salary?: number;
-  hiring_fee?: number;
-  billing_day?: number;
+  contract_status?: string;    
+  employment_status?: string;  
+  client_assigned?: string;    
+  project_name?: string;       
+  contract_start?: string;     
+  contract_end?: string;       
+  first_salary?: number;       // Base para o balanço
+  hiring_fee?: number;         // 50%, 65% ou 75% calculados
+  hiring_notes?: string;       // Nota histórica do fechamento
+  billing_day?: number;        
   payment_status?: string;
 }
 
@@ -120,7 +113,7 @@ export default function TammyPlatform() {
       setView('home'); 
       window.scrollTo({ top: 0, behavior: 'smooth' }); 
     } else { 
-      alert("Protocolo não localizado na governança."); 
+      alert("Protocolo não localizado na governança Lion."); 
     }
   };
 
@@ -135,6 +128,7 @@ export default function TammyPlatform() {
       employment_status: 'Disponível'
     };
 
+    console.log("GRAVANDO ATIVO LION:", dbPayload);
     const { error } = await supabase.from('tickets').insert([dbPayload]);
     
     if (!error) {
@@ -148,7 +142,7 @@ export default function TammyPlatform() {
   };
 
   const updateTicketERP = async (id: string, updatedData: any) => {
-    console.log(`AUDITORIA: Atualizando Ativo ${id}`, updatedData);
+    console.log(`AUDITORIA FINANCEIRA: Atualizando Ativo ${id}`, updatedData);
     const { error } = await supabase.from('tickets').update(updatedData).eq('id', id);
     if (!error) {
       setAllTickets(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
